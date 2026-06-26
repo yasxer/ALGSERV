@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  /* Dark — green-tinted ink (text, header, footer) */
+  --color-ink-900: #0C2B22;
+  --color-ink-700: #1A3A30;
+  --color-ink-500: #7A9B8A;     /* muted on dark surfaces */
+  --color-slate-600: #334155;   /* muted on light surfaces */
+
+  /* Emerald — primary action (buttons, links, CTAs — keep scarce) */
+  --color-emerald-900: #064E3B;
+  --color-emerald-700: #0E7C5A;
+  --color-emerald-500: #10A37F;
+  --color-emerald-100: #D1FAE5;
+
+  /* Copper — accent, very sparingly (thin rules, icons only) */
+  --color-copper-700: #9A4F2B;
+  --color-copper-500: #B86A3E;
+  --color-copper-100: #F5E6DC;
+
+  /* Neutrals (~60% of the UI) */
+  --color-surface: #F7FAF9;
+  --color-border:  #E8EDEB;
+
+  /* Font */
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+
+  --radius-DEFAULT: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #ffffff;
+  color: #0C2B22;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: clip;
+  width: 100%;
+}
