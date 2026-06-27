@@ -7,19 +7,21 @@ import Footer from '../../components/Footer'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Exp   = { id: string; position: string; company: string; city: string; startDate: string; endDate: string; current: boolean; description: string }
-type Edu   = { id: string; degree: string; school: string; city: string; year: string }
-type Skill = { id: string; name: string; level: number }
-type Lang  = { id: string; name: string; level: number }
+type Exp      = { id: string; position: string; company: string; city: string; startDate: string; endDate: string; current: boolean; description: string }
+type Edu      = { id: string; degree: string; school: string; city: string; year: string }
+type Skill    = { id: string; name: string; level: number }
+type Lang     = { id: string; name: string; level: number }
+type Interest = { id: string; name: string; icon: string }
 
 type CVData = {
   firstName: string; lastName: string; jobTitle: string
   email: string; phone: string; address: string; city: string; linkedin: string
   birthDate: string; nationality: string; maritalStatus: string; license: string
   profile: string
+  photo: string
   exps: Exp[]; edus: Edu[]
   skills: Skill[]; tools: Skill[]; langs: Lang[]
-  interests: string
+  interests: Interest[]
 }
 
 let _c = 0
@@ -29,9 +31,12 @@ const BLANK: CVData = {
   firstName: '', lastName: '', jobTitle: '',
   email: '', phone: '', address: '', city: '', linkedin: '',
   birthDate: '', nationality: '', maritalStatus: '', license: '',
-  profile: '',
+  profile: '', photo: '',
   exps: [], edus: [], skills: [], tools: [], langs: [],
-  interests: '',
+  interests: [
+    { id: uid(), name: '', icon: 'book' },
+    { id: uid(), name: '', icon: 'music' },
+  ],
 }
 
 // ─── i18n ────────────────────────────────────────────────────────────────────
@@ -45,17 +50,19 @@ const T = {
     linkedin: 'LinkedIn / Site web',
     birthDate: 'Date de naissance', nationality: 'Nationalité',
     maritalStatus: 'Situation familiale', license: 'Permis de conduire',
+    photo: 'Photo (optionnel)', removePhoto: 'Supprimer',
     position: 'Poste', company: 'Entreprise', startDate: 'Début', endDate: 'Fin',
     currentJob: 'Poste actuel', taskDesc: 'Missions & réalisations',
     degree: 'Diplôme / Certification', school: 'Établissement', gradYear: "Année d'obtention",
     skillName: 'Compétence', toolName: 'Outil (Word, Excel…)', langName: 'Langue',
+    interestName: "Centre d'intérêt",
     sPersonal: 'Informations personnelles', sProfile: 'Profil / Résumé',
     sExp: 'Expérience professionnelle', sEdu: 'Formation',
     sSkills: 'Compétences', sTools: 'Outils informatiques',
     sLangs: 'Langues', sInterests: "Centres d'intérêt",
     addExp: 'Ajouter une expérience', addEdu: 'Ajouter une formation',
     addSkill: 'Ajouter une compétence', addTool: 'Ajouter un outil',
-    addLang: 'Ajouter une langue',
+    addLang: 'Ajouter une langue', addInterest: "Ajouter un centre d'intérêt",
     delete: 'Supprimer', download: 'Télécharger en PDF', preview: 'Aperçu du CV',
     previewSub: 'Mis à jour en temps réel.',
     printHint: "Choisissez « Enregistrer en PDF » dans la boîte d'impression",
@@ -82,17 +89,19 @@ const T = {
     linkedin: 'LinkedIn / Website',
     birthDate: 'Date of birth', nationality: 'Nationality',
     maritalStatus: 'Marital status', license: "Driver's license",
+    photo: 'Photo (optional)', removePhoto: 'Remove',
     position: 'Position', company: 'Company', startDate: 'Start', endDate: 'End',
     currentJob: 'Current position', taskDesc: 'Responsibilities & achievements',
     degree: 'Degree / Certification', school: 'Institution', gradYear: 'Graduation year',
     skillName: 'Skill', toolName: 'Tool (Word, Excel…)', langName: 'Language',
+    interestName: 'Interest',
     sPersonal: 'Personal information', sProfile: 'Profile / Summary',
     sExp: 'Work experience', sEdu: 'Education',
     sSkills: 'Skills', sTools: 'Computer tools',
     sLangs: 'Languages', sInterests: 'Interests',
     addExp: 'Add experience', addEdu: 'Add education',
     addSkill: 'Add skill', addTool: 'Add tool',
-    addLang: 'Add language',
+    addLang: 'Add language', addInterest: 'Add interest',
     delete: 'Delete', download: 'Download PDF', preview: 'CV Preview',
     previewSub: 'Updated in real time.',
     printHint: 'Choose "Save as PDF" in the print dialog',
@@ -119,17 +128,19 @@ const T = {
     linkedin: 'لينكد إن / الموقع',
     birthDate: 'تاريخ الميلاد', nationality: 'الجنسية',
     maritalStatus: 'الحالة الاجتماعية', license: 'رخصة القيادة',
+    photo: 'الصورة (اختياري)', removePhoto: 'حذف',
     position: 'المنصب', company: 'الشركة / المؤسسة', startDate: 'البداية', endDate: 'النهاية',
     currentJob: 'منصب حالي', taskDesc: 'المهام والإنجازات',
     degree: 'الشهادة / الدبلوم', school: 'المؤسسة التعليمية', gradYear: 'سنة التخرج',
     skillName: 'مهارة', toolName: 'أداة (Word, Excel…)', langName: 'لغة',
+    interestName: 'اهتمام',
     sPersonal: 'المعلومات الشخصية', sProfile: 'الملف الشخصي',
     sExp: 'الخبرات المهنية', sEdu: 'التعليم والتكوين',
     sSkills: 'المهارات', sTools: 'الأدوات التقنية',
     sLangs: 'اللغات', sInterests: 'الاهتمامات',
     addExp: 'إضافة خبرة', addEdu: 'إضافة تكوين',
     addSkill: 'إضافة مهارة', addTool: 'إضافة أداة',
-    addLang: 'إضافة لغة',
+    addLang: 'إضافة لغة', addInterest: 'إضافة اهتمام',
     delete: 'حذف', download: 'تحميل PDF', preview: 'معاينة السيرة الذاتية',
     previewSub: 'يتحدث في الوقت الفعلي.',
     printHint: 'اختر "حفظ كـ PDF" في مربع الطباعة',
@@ -151,6 +162,98 @@ const T = {
     emptyPreview: 'أدخل معلوماتك لرؤية سيرتك الذاتية',
   },
 } as const
+
+// ─── Interest icons ───────────────────────────────────────────────────────────
+
+const INTEREST_ICONS = [
+  { key: 'book',    label: 'Lecture'  },
+  { key: 'music',   label: 'Musique'  },
+  { key: 'sport',   label: 'Sport'    },
+  { key: 'travel',  label: 'Voyage'   },
+  { key: 'cinema',  label: 'Cinéma'   },
+  { key: 'tech',    label: 'Tech'     },
+  { key: 'art',     label: 'Art'      },
+  { key: 'food',    label: 'Cuisine'  },
+  { key: 'nature',  label: 'Nature'   },
+  { key: 'photo',   label: 'Photo'    },
+  { key: 'game',    label: 'Jeux'     },
+  { key: 'fitness', label: 'Fitness'  },
+]
+
+const INTEREST_PATHS: Record<string, string[]> = {
+  book:    ["M4 19.5A2.5 2.5 0 0 1 6.5 17H20", "M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"],
+  music:   ["M9 18V5l12-2v13", "M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"],
+  sport:   ["M22 12h-4l-3 9L9 3l-3 9H2"],
+  travel:  ["M3 11l19-9-9 19-2-8-8-2z"],
+  cinema:  ["M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z", "M7 3v18", "M17 3v18", "M3 12h18"],
+  tech:    ["M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"],
+  art:     ["M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z", "M16 8L2 22"],
+  food:    ["M18 8h1a4 4 0 0 1 0 8h-1", "M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z", "M6 1v3", "M10 1v3", "M14 1v3"],
+  nature:  ["M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0z", "M12 1v2", "M12 21v2", "M4.22 4.22l1.42 1.42", "M18.36 18.36l1.42 1.42", "M1 12h2", "M21 12h2", "M4.22 19.78l1.42-1.42", "M18.36 5.64l1.42-1.42"],
+  photo:   ["M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z", "M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"],
+  game:    ["M6 12h2m2-2v4m5-1h.5M18 11h.5", "M17.32 5H6.68a4 4 0 0 0-3.978 3.59l-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258l-.017-.151A4 4 0 0 0 17.32 5z"],
+  fitness: ["M13 2L3 14h9l-1 8 10-12h-9l1-8z"],
+}
+
+function IIcon({ name, size = 11, color = 'currentColor' }: { name: string; size?: number; color?: string }) {
+  const paths = INTEREST_PATHS[name] || INTEREST_PATHS.book
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+      {paths.map((d, i) => <path key={i} d={d} />)}
+    </svg>
+  )
+}
+
+// ─── Contact icons ────────────────────────────────────────────────────────────
+
+const CONTACT_PATHS: Record<string, string[]> = {
+  phone:    ["M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"],
+  email:    ["M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z", "M22 6l-10 7L2 6"],
+  location: ["M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z", "M12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"],
+  link:     ["M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71", "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"],
+  calendar: ["M8 2v4", "M16 2v4", "M3 6h18a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z", "M3 10h18"],
+  flag:     ["M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z", "M4 22v-7"],
+  heart:    ["M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"],
+  id:       ["M1 4h22v16H1z", "M1 10h22"],
+}
+
+function CIcon({ type, size = 10, color = 'currentColor' }: { type: string; size?: number; color?: string }) {
+  const paths = CONTACT_PATHS[type] || []
+  if (!paths.length) return null
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, display: 'inline-block' }}>
+      {paths.map((d, i) => <path key={i} d={d} />)}
+    </svg>
+  )
+}
+
+// ─── Icon picker (interests form) ─────────────────────────────────────────────
+
+function IconPicker({ value, onChange }: { value: string; onChange: (icon: string) => void }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ position: 'relative' }}>
+      <button type="button" onClick={() => setOpen(o => !o)}
+        className="w-9 h-9 border border-border rounded-lg flex items-center justify-center hover:border-emerald-700 transition-colors shrink-0 bg-white">
+        <IIcon name={value} size={16} color="#047857" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute top-10 left-0 z-20 bg-white border border-border rounded-xl shadow-lg p-2 grid grid-cols-4 gap-1" style={{ width: '164px' }}>
+            {INTEREST_ICONS.map(ic => (
+              <button key={ic.key} type="button" title={ic.label}
+                onClick={() => { onChange(ic.key); setOpen(false) }}
+                className={`w-9 h-9 rounded-lg flex items-center justify-center hover:bg-emerald-50 transition-colors ${value === ic.key ? 'bg-emerald-100 border border-emerald-600' : ''}`}>
+                <IIcon name={ic.key} size={15} color={value === ic.key ? '#047857' : '#64748B'} />
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 
 // ─── Form helpers ─────────────────────────────────────────────────────────────
 
@@ -214,11 +317,23 @@ function CVDocumentBlue({ d, lang }: { d: CVData; lang: LangKey }) {
   const isRTL = lang === 'ar'
   const t = T[lang]
 
-  const filledExps   = d.exps.filter(e => e.position || e.company)
-  const filledEdus   = d.edus.filter(e => e.degree || e.school)
-  const filledSkills = d.skills.filter(s => s.name)
-  const filledTools  = d.tools.filter(s => s.name)
-  const filledLangs  = d.langs.filter(l => l.name)
+  const filledExps      = d.exps.filter(e => e.position || e.company)
+  const filledEdus      = d.edus.filter(e => e.degree || e.school)
+  const filledSkills    = d.skills.filter(s => s.name)
+  const filledTools     = d.tools.filter(s => s.name)
+  const filledLangs     = d.langs.filter(l => l.name)
+  const filledInterests = d.interests.filter(i => i.name)
+
+  const score  = (d.profile ? 2 : 0) + filledExps.length * 3 + filledEdus.length * 2 + (filledSkills.length + filledTools.length) * 0.5 + filledLangs.length * 0.5 + (filledInterests.length > 0 ? 1 : 0)
+  const sparse = score < 5
+  const dense  = score > 14
+
+  const nameSize   = sparse ? '26pt' : dense ? '18pt' : '22pt'
+  const titleSize  = sparse ? '11pt' : dense ? '8pt'  : '9.5pt'
+  const bodyFont   = sparse ? '10pt' : dense ? '8pt'  : '9pt'
+  const hdrPad     = sparse ? 28     : dense ? 18     : 24
+  const circleSize = sparse ? 100    : dense ? 72     : 88
+  const initFont   = sparse ? '24pt' : dense ? '15pt' : '20pt'
 
   const BLUE = '#1B4F8C'
   const SBG  = '#F4F7FB'
@@ -254,24 +369,27 @@ function CVDocumentBlue({ d, lang }: { d: CVData; lang: LangKey }) {
     <div style={{ width: '210mm', minHeight: '297mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: BODY, background: 'white', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
-      <div style={{ padding: '24px 28px', display: 'flex', alignItems: 'flex-start', gap: '18px', flexDirection: isRTL ? 'row-reverse' : 'row', borderBottom: '1px solid #E2E8F0' }}>
-        <div style={{ width: '88px', height: '88px', borderRadius: '50%', background: '#E0E7EF', border: `2px solid ${BLUE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '20pt', fontWeight: 'bold', color: BLUE }}>
-          {initials}
+      <div style={{ padding: `${hdrPad}px 28px`, display: 'flex', alignItems: 'flex-start', gap: '18px', flexDirection: isRTL ? 'row-reverse' : 'row', borderBottom: '1px solid #E2E8F0' }}>
+        <div style={{ width: `${circleSize}px`, height: `${circleSize}px`, borderRadius: '50%', background: '#E0E7EF', border: `2px solid ${BLUE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+          {d.photo
+            ? <img src={d.photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <span style={{ fontSize: initFont, fontWeight: 'bold', color: BLUE }}>{initials}</span>
+          }
         </div>
         <div style={{ flex: 1, textAlign: isRTL ? 'right' : 'left' }}>
-          <div style={{ fontSize: '22pt', fontWeight: 'bold', color: '#0F172A', lineHeight: 1.1, marginBottom: '4px' }}>{fullName}</div>
-          {d.jobTitle && <div style={{ fontSize: '9.5pt', color: BLUE, marginBottom: '8px', letterSpacing: '0.2px' }}>{d.jobTitle}</div>}
-          {d.profile  && <div style={{ fontSize: '8pt', color: '#64748B', lineHeight: 1.65, maxWidth: '370px' }}>{d.profile}</div>}
+          <div style={{ fontSize: nameSize, fontWeight: 'bold', color: '#0F172A', lineHeight: 1.1, marginBottom: '4px' }}>{fullName}</div>
+          {d.jobTitle && <div style={{ fontSize: titleSize, color: BLUE, marginBottom: '8px', letterSpacing: '0.2px' }}>{d.jobTitle}</div>}
+          {d.profile  && <div style={{ fontSize: bodyFont, color: '#64748B', lineHeight: 1.65, maxWidth: '370px' }}>{d.profile}</div>}
         </div>
       </div>
 
       {/* Contact bar */}
       {(d.phone || d.email || d.city || d.address || d.linkedin) && (
-        <div style={{ padding: '8px 28px', display: 'flex', gap: '18px', flexWrap: 'wrap', justifyContent: isRTL ? 'flex-end' : 'flex-start', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', fontSize: '7.5pt', color: '#475569' }}>
-          {d.phone    && <span>📞 {d.phone}</span>}
-          {d.email    && <span>✉ {d.email}</span>}
-          {(d.city || d.address) && <span>📍 {[d.address, d.city].filter(Boolean).join(', ')}</span>}
-          {d.linkedin && <span>🔗 {d.linkedin}</span>}
+        <div style={{ padding: '8px 28px', display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: isRTL ? 'flex-end' : 'flex-start', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', fontSize: '7.5pt', color: '#475569' }}>
+          {d.phone    && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CIcon type="phone" size={10} color="#475569" />{d.phone}</span>}
+          {d.email    && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CIcon type="email" size={10} color="#475569" />{d.email}</span>}
+          {(d.city || d.address) && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CIcon type="location" size={10} color="#475569" />{[d.address, d.city].filter(Boolean).join(', ')}</span>}
+          {d.linkedin && <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CIcon type="link" size={10} color="#475569" />{d.linkedin}</span>}
         </div>
       )}
 
@@ -284,11 +402,11 @@ function CVDocumentBlue({ d, lang }: { d: CVData; lang: LangKey }) {
           {(d.birthDate || d.nationality || d.maritalStatus || d.license) && (
             <div>
               <span style={secTitle()}>{t.cvPersonal}</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '8pt', color: BODY, textAlign: isRTL ? 'right' : 'left' }}>
-                {d.birthDate     && <div>📅 {d.birthDate}</div>}
-                {d.nationality   && <div>🏳 {d.nationality}</div>}
-                {d.maritalStatus && <div>💙 {d.maritalStatus}</div>}
-                {d.license       && <div>🪪 {d.license}</div>}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '8pt', color: BODY, textAlign: isRTL ? 'right' : 'left' }}>
+                {d.birthDate     && <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexDirection: isRTL ? 'row-reverse' : 'row' }}><CIcon type="calendar" size={9} color="#64748B" />{d.birthDate}</div>}
+                {d.nationality   && <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexDirection: isRTL ? 'row-reverse' : 'row' }}><CIcon type="flag" size={9} color="#64748B" />{d.nationality}</div>}
+                {d.maritalStatus && <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexDirection: isRTL ? 'row-reverse' : 'row' }}><CIcon type="heart" size={9} color="#64748B" />{d.maritalStatus}</div>}
+                {d.license       && <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexDirection: isRTL ? 'row-reverse' : 'row' }}><CIcon type="id" size={9} color="#64748B" />{d.license}</div>}
               </div>
             </div>
           )}
@@ -358,9 +476,9 @@ function CVDocumentBlue({ d, lang }: { d: CVData; lang: LangKey }) {
                       <div style={{ flex: 1, width: '1.5px', background: '#C0CDE0', marginTop: '3px' }} />
                     </div>
                     <div style={{ flex: 1, paddingBottom: '6px', textAlign: isRTL ? 'right' : 'left' }}>
-                      <div style={{ fontWeight: 'bold', fontSize: '9pt', color: '#0F172A' }}>{e.position}</div>
+                      <div style={{ fontWeight: 'bold', fontSize: sparse ? '10.5pt' : '9pt', color: '#0F172A' }}>{e.position}</div>
                       {e.company && <div style={{ fontSize: '8pt', color: '#64748B', fontStyle: 'italic', marginBottom: '3px' }}>{e.company}{e.city ? `, ${e.city}` : ''}</div>}
-                      {e.description && <div style={{ fontSize: '7.5pt', color: BODY, lineHeight: 1.6, whiteSpace: 'pre-line' }}>{e.description}</div>}
+                      {e.description && <div style={{ fontSize: bodyFont, color: BODY, lineHeight: 1.6, whiteSpace: 'pre-line' }}>{e.description}</div>}
                     </div>
                   </div>
                 ))}
@@ -380,7 +498,7 @@ function CVDocumentBlue({ d, lang }: { d: CVData; lang: LangKey }) {
                       <div style={{ flex: 1, width: '1.5px', background: '#C0CDE0', marginTop: '3px' }} />
                     </div>
                     <div style={{ flex: 1, paddingBottom: '5px', textAlign: isRTL ? 'right' : 'left' }}>
-                      <div style={{ fontWeight: 'bold', fontSize: '9pt', color: '#0F172A' }}>{e.degree}</div>
+                      <div style={{ fontWeight: 'bold', fontSize: sparse ? '10.5pt' : '9pt', color: '#0F172A' }}>{e.degree}</div>
                       {e.school && <div style={{ fontSize: '8pt', color: '#64748B', fontStyle: 'italic' }}>{e.school}{e.city ? `, ${e.city}` : ''}</div>}
                     </div>
                   </div>
@@ -389,14 +507,21 @@ function CVDocumentBlue({ d, lang }: { d: CVData; lang: LangKey }) {
             </div>
           )}
 
-          {d.interests && (
+          {filledInterests.length > 0 && (
             <div>
               <span style={secTitle()}>{t.cvInterests}</span>
-              <div style={{ fontSize: '8pt', color: BODY, lineHeight: 1.7, textAlign: isRTL ? 'right' : 'left' }}>{d.interests}</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {filledInterests.map(interest => (
+                  <span key={interest.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '7.5pt', background: '#EEF3FB', color: BLUE, padding: '3px 9px', borderRadius: '20px', border: `0.5px solid ${BLUE}30` }}>
+                    <IIcon name={interest.icon} size={9} color={BLUE} />
+                    {interest.name}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 
-          {filledExps.length === 0 && filledEdus.length === 0 && !d.interests && (
+          {filledExps.length === 0 && filledEdus.length === 0 && filledInterests.length === 0 && (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: '9pt', fontStyle: 'italic', textAlign: 'center' }}>
               {t.emptyPreview}
             </div>
@@ -413,12 +538,13 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
   const isRTL = lang === 'ar'
   const t = T[lang]
 
-  const filledExps   = d.exps.filter(e => e.position || e.company)
-  const filledEdus   = d.edus.filter(e => e.degree || e.school)
-  const filledSkills = [...d.skills, ...d.tools].filter(s => s.name)
-  const filledLangs  = d.langs.filter(l => l.name)
+  const filledExps      = d.exps.filter(e => e.position || e.company)
+  const filledEdus      = d.edus.filter(e => e.degree || e.school)
+  const filledSkills    = [...d.skills, ...d.tools].filter(s => s.name)
+  const filledLangs     = d.langs.filter(l => l.name)
+  const filledInterests = d.interests.filter(i => i.name)
 
-  const score = (d.profile ? 2 : 0) + filledExps.length * 3 + filledEdus.length * 2 + filledSkills.length * 0.5 + filledLangs.length * 0.5 + (d.interests ? 1 : 0)
+  const score = (d.profile ? 2 : 0) + filledExps.length * 3 + filledEdus.length * 2 + filledSkills.length * 0.5 + filledLangs.length * 0.5 + (filledInterests.length > 0 ? 1 : 0)
   const sparse = score < 5
   const dense  = score > 14
 
@@ -456,8 +582,11 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
       {/* Header */}
       <div style={{ background: 'linear-gradient(120deg, #064E3B 0%, #0E7C5A 100%)', padding: `${hdrPad}px 32px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '18px', flex: 1, minWidth: 0, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-          <div style={{ width: `${circleSize}px`, height: `${circleSize}px`, borderRadius: '50%', background: 'rgba(255,255,255,0.14)', border: '2px solid rgba(255,255,255,0.38)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: initFont, fontWeight: 'bold', color: 'white' }}>
-            {initials}
+          <div style={{ width: `${circleSize}px`, height: `${circleSize}px`, borderRadius: '50%', background: 'rgba(255,255,255,0.14)', border: '2px solid rgba(255,255,255,0.38)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+            {d.photo
+              ? <img src={d.photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span style={{ fontSize: initFont, fontWeight: 'bold', color: 'white' }}>{initials}</span>
+            }
           </div>
           <div style={{ minWidth: 0, textAlign: isRTL ? 'right' : 'left' }}>
             <div style={{ fontSize: nameSize, fontWeight: 'bold', color: 'white', lineHeight: 1.1, letterSpacing: '-0.3px' }}>{fullName}</div>
@@ -465,11 +594,11 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
           </div>
         </div>
         {(d.email || d.phone || d.address || d.city || d.linkedin) && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '8pt', color: 'rgba(255,255,255,0.85)', textAlign: isRTL ? 'left' : 'right', flexShrink: 0 }}>
-            {d.email    && <div>✉  {d.email}</div>}
-            {d.phone    && <div>✆  {d.phone}</div>}
-            {(d.address || d.city) && <div>📍 {[d.address, d.city].filter(Boolean).join(', ')}</div>}
-            {d.linkedin && <div>🔗 {d.linkedin}</div>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '8pt', color: 'rgba(255,255,255,0.85)', textAlign: isRTL ? 'left' : 'right', flexShrink: 0 }}>
+            {d.email    && <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: isRTL ? 'flex-start' : 'flex-end' }}><CIcon type="email" size={9} color="rgba(255,255,255,0.85)" />{d.email}</div>}
+            {d.phone    && <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: isRTL ? 'flex-start' : 'flex-end' }}><CIcon type="phone" size={9} color="rgba(255,255,255,0.85)" />{d.phone}</div>}
+            {(d.address || d.city) && <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: isRTL ? 'flex-start' : 'flex-end' }}><CIcon type="location" size={9} color="rgba(255,255,255,0.85)" />{[d.address, d.city].filter(Boolean).join(', ')}</div>}
+            {d.linkedin && <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: isRTL ? 'flex-start' : 'flex-end' }}><CIcon type="link" size={9} color="rgba(255,255,255,0.85)" />{d.linkedin}</div>}
           </div>
         )}
       </div>
@@ -508,13 +637,20 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
               </div>
             </div>
           )}
-          {d.interests && (
+          {filledInterests.length > 0 && (
             <div>
               <div style={secTitle}>{t.cvInterests}</div>
-              <div style={{ fontSize: sparse ? '9.5pt' : '8.5pt', color: '#374151', lineHeight: 1.7, textAlign: isRTL ? 'right' : 'left' }}>{d.interests}</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                {filledInterests.map(interest => (
+                  <span key={interest.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: sparse ? '8pt' : '7.5pt', background: '#D1FAE5', color: '#065f46', padding: '2px 7px', borderRadius: '20px' }}>
+                    <IIcon name={interest.icon} size={8} color="#0E7C5A" />
+                    {interest.name}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
-          {filledSkills.length === 0 && filledLangs.length === 0 && !d.interests && <div style={{ flex: 1 }} />}
+          {filledSkills.length === 0 && filledLangs.length === 0 && filledInterests.length === 0 && <div style={{ flex: 1 }} />}
         </div>
 
         {/* Main */}
@@ -541,7 +677,7 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
                         {[e.startDate, e.current ? t.present : e.endDate].filter(Boolean).join(' – ')}
                       </span>
                     </div>
-                    {e.city && <div style={{ fontSize: '7.5pt', color: '#6b7280', marginBottom: '4px', textAlign: isRTL ? 'right' : 'left' }}>📍 {e.city}</div>}
+                    {e.city && <div style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '7.5pt', color: '#6b7280', marginBottom: '4px', textAlign: isRTL ? 'right' : 'left' }}><CIcon type="location" size={8} color="#9ca3af" />{e.city}</div>}
                     {e.description && <div style={{ fontSize: bodyFont, color: '#374151', lineHeight: 1.65, whiteSpace: 'pre-line', marginTop: '4px', textAlign: isRTL ? 'right' : 'left' }}>{e.description}</div>}
                   </div>
                 ))}
@@ -562,7 +698,7 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
                       </div>
                       {e.year && <span style={{ fontSize: '7.5pt', color: '#6b7280', whiteSpace: 'nowrap', flexShrink: 0 }}>{e.year}</span>}
                     </div>
-                    {e.city && <div style={{ fontSize: '7.5pt', color: '#6b7280', textAlign: isRTL ? 'right' : 'left' }}>📍 {e.city}</div>}
+                    {e.city && <div style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '7.5pt', color: '#6b7280', textAlign: isRTL ? 'right' : 'left' }}><CIcon type="location" size={8} color="#9ca3af" />{e.city}</div>}
                   </div>
                 ))}
               </div>
@@ -584,7 +720,6 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
 function BlueThumbnail() {
   return (
     <div style={{ width: '100%', height: '100%', background: 'white', display: 'flex', flexDirection: 'column', fontFamily: 'sans-serif', overflow: 'hidden' }}>
-      {/* Header */}
       <div style={{ padding: '8px 10px', display: 'flex', gap: '6px', alignItems: 'center', borderBottom: '1px solid #E2E8F0' }}>
         <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#E0E7EF', border: '1.5px solid #1B4F8C', flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
@@ -592,13 +727,10 @@ function BlueThumbnail() {
           <div style={{ height: '3px', background: '#1B4F8C', borderRadius: '2px', width: '35%' }} />
         </div>
       </div>
-      {/* Contact */}
       <div style={{ height: '8px', background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', display: 'flex', gap: '4px', alignItems: 'center', padding: '0 10px' }}>
         {[30,40,25].map((w, i) => <div key={i} style={{ height: '2px', background: '#CBD5E1', borderRadius: '1px', width: `${w}%` }} />)}
       </div>
-      {/* Body */}
       <div style={{ flex: 1, display: 'flex' }}>
-        {/* Sidebar */}
         <div style={{ width: '38%', background: '#F4F7FB', padding: '6px 5px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
           {[['1B4F8C',70],['1B4F8C',55],['1B4F8C',45]].map(([c,w], i) => (
             <div key={i}>
@@ -611,7 +743,6 @@ function BlueThumbnail() {
             </div>
           ))}
         </div>
-        {/* Main */}
         <div style={{ flex: 1, padding: '6px 7px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
           <div style={{ height: '2px', background: '#1B4F8C', width: '70%', marginBottom: '3px', opacity: 0.6 }} />
           {[85,65,75,50].map((w, i) => (
@@ -632,7 +763,6 @@ function BlueThumbnail() {
 function GreenThumbnail() {
   return (
     <div style={{ width: '100%', height: '100%', background: 'white', display: 'flex', flexDirection: 'column', fontFamily: 'sans-serif', overflow: 'hidden' }}>
-      {/* Header */}
       <div style={{ background: 'linear-gradient(120deg, #064E3B 0%, #0E7C5A 100%)', padding: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
         <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: '1.5px solid rgba(255,255,255,0.4)', flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
@@ -640,9 +770,7 @@ function GreenThumbnail() {
           <div style={{ height: '3px', background: 'rgba(167,243,208,0.8)', borderRadius: '2px', width: '30%' }} />
         </div>
       </div>
-      {/* Body */}
       <div style={{ flex: 1, display: 'flex' }}>
-        {/* Sidebar */}
         <div style={{ width: '38%', background: '#F7FAF9', borderRight: '1px solid #E8EDEB', padding: '6px 5px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
           {[70,55,45].map((w, i) => (
             <div key={i}>
@@ -655,7 +783,6 @@ function GreenThumbnail() {
             </div>
           ))}
         </div>
-        {/* Main */}
         <div style={{ flex: 1, padding: '6px 7px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
           <div style={{ height: '2px', background: '#0E7C5A', width: '70%', marginBottom: '3px', opacity: 0.6 }} />
           {[85,65,75,50].map((w, i) => (
@@ -679,20 +806,8 @@ function TemplateStep({ onSelect }: { onSelect: (id: string) => void }) {
   const [hovered, setHovered] = useState<string | null>(null)
 
   const templates = [
-    {
-      id: 'blue',
-      name: 'Classique Bleu',
-      sub: 'Layout structuré, sidebar claire, idéal pour tous les secteurs',
-      accentHex: '#1B4F8C',
-      Thumb: BlueThumbnail,
-    },
-    {
-      id: 'green',
-      name: 'Moderne Vert',
-      sub: 'En-tête dégradé élégant, design contemporain et percutant',
-      accentHex: '#0E7C5A',
-      Thumb: GreenThumbnail,
-    },
+    { id: 'blue',  name: 'Classique Bleu',  sub: 'Layout structuré, sidebar claire, idéal pour tous les secteurs', accentHex: '#1B4F8C', Thumb: BlueThumbnail },
+    { id: 'green', name: 'Moderne Vert',    sub: 'En-tête dégradé élégant, design contemporain et percutant',      accentHex: '#0E7C5A', Thumb: GreenThumbnail },
   ]
 
   return (
@@ -711,11 +826,9 @@ function TemplateStep({ onSelect }: { onSelect: (id: string) => void }) {
             onMouseLeave={() => setHovered(null)}
             className={`group text-left border-2 rounded-2xl overflow-hidden transition-all duration-200 ${hovered === tpl.id ? 'shadow-lg -translate-y-0.5' : 'shadow-sm'}`}
             style={{ borderColor: hovered === tpl.id ? tpl.accentHex : '#E8EDEB' }}>
-            {/* Thumbnail */}
             <div className="w-full bg-surface" style={{ aspectRatio: '210/150' }}>
               <tpl.Thumb />
             </div>
-            {/* Label */}
             <div className="p-4 bg-white">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-3 h-3 rounded-full shrink-0" style={{ background: tpl.accentHex }} />
@@ -738,11 +851,7 @@ function TemplateStep({ onSelect }: { onSelect: (id: string) => void }) {
 
 // ─── Step 2: Language Picker ──────────────────────────────────────────────────
 
-function LanguageStep({ template, onSelect, onBack }: {
-  template: string
-  onSelect: (lang: LangKey) => void
-  onBack: () => void
-}) {
+function LanguageStep({ template, onSelect, onBack }: { template: string; onSelect: (lang: LangKey) => void; onBack: () => void }) {
   const langs: { id: LangKey; flag: string; label: string; sub: string; dir: string }[] = [
     { id: 'fr', flag: '🇫🇷', label: 'Français', sub: 'Gauche → Droite', dir: 'LTR' },
     { id: 'en', flag: '🇬🇧', label: 'English',  sub: 'Left → Right',    dir: 'LTR' },
@@ -787,12 +896,7 @@ function LanguageStep({ template, onSelect, onBack }: {
 
 // ─── Step 3: Form ─────────────────────────────────────────────────────────────
 
-function CVForm({ d, setD, template, lang }: {
-  d: CVData
-  setD: React.Dispatch<React.SetStateAction<CVData>>
-  template: string
-  lang: LangKey
-}) {
+function CVForm({ d, setD, template, lang }: { d: CVData; setD: React.Dispatch<React.SetStateAction<CVData>>; template: string; lang: LangKey }) {
   const t = T[lang]
   const isRTL = lang === 'ar'
 
@@ -800,25 +904,39 @@ function CVForm({ d, setD, template, lang }: {
     setD(prev => ({ ...prev, [k]: v }))
   }, [setD])
 
-  function addExp() { set('exps', [...d.exps, { id: uid(), position: '', company: '', city: '', startDate: '', endDate: '', current: false, description: '' }]) }
-  function delExp(id: string) { set('exps', d.exps.filter(e => e.id !== id)) }
-  function setExp(id: string, f: keyof Exp, v: string | boolean) { set('exps', d.exps.map(e => e.id === id ? { ...e, [f]: v } : e)) }
+  const handlePhoto = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => set('photo', ev.target?.result as string ?? '')
+    reader.readAsDataURL(file)
+  }, [set])
 
-  function addEdu() { set('edus', [...d.edus, { id: uid(), degree: '', school: '', city: '', year: '' }]) }
-  function delEdu(id: string) { set('edus', d.edus.filter(e => e.id !== id)) }
-  function setEdu(id: string, f: keyof Edu, v: string) { set('edus', d.edus.map(e => e.id === id ? { ...e, [f]: v } : e)) }
+  const initials = [d.firstName?.[0], d.lastName?.[0]].filter(Boolean).join('').toUpperCase() || '?'
+
+  function addExp()  { set('exps',  [...d.exps,  { id: uid(), position: '', company: '', city: '', startDate: '', endDate: '', current: false, description: '' }]) }
+  function delExp(id: string)  { set('exps',  d.exps.filter(e => e.id !== id)) }
+  function setExp(id: string, f: keyof Exp, v: string | boolean)  { set('exps',  d.exps.map(e => e.id === id ? { ...e, [f]: v } : e)) }
+
+  function addEdu()  { set('edus',  [...d.edus,  { id: uid(), degree: '', school: '', city: '', year: '' }]) }
+  function delEdu(id: string)  { set('edus',  d.edus.filter(e => e.id !== id)) }
+  function setEdu(id: string, f: keyof Edu, v: string)  { set('edus',  d.edus.map(e => e.id === id ? { ...e, [f]: v } : e)) }
 
   function addSkill() { set('skills', [...d.skills, { id: uid(), name: '', level: 3 }]) }
-  function delSkill(id: string) { set('skills', d.skills.filter(s => s.id !== id)) }
+  function delSkill(id: string)  { set('skills', d.skills.filter(s => s.id !== id)) }
   function setSkill(id: string, f: keyof Skill, v: string | number) { set('skills', d.skills.map(s => s.id === id ? { ...s, [f]: v } : s)) }
 
-  function addTool() { set('tools', [...d.tools, { id: uid(), name: '', level: 3 }]) }
-  function delTool(id: string) { set('tools', d.tools.filter(s => s.id !== id)) }
-  function setTool(id: string, f: keyof Skill, v: string | number) { set('tools', d.tools.map(s => s.id === id ? { ...s, [f]: v } : s)) }
+  function addTool()  { set('tools',  [...d.tools,  { id: uid(), name: '', level: 3 }]) }
+  function delTool(id: string)  { set('tools',  d.tools.filter(s => s.id !== id)) }
+  function setTool(id: string, f: keyof Skill, v: string | number) { set('tools',  d.tools.map(s => s.id === id ? { ...s, [f]: v } : s)) }
 
-  function addLang() { set('langs', [...d.langs, { id: uid(), name: '', level: 3 }]) }
-  function delLang(id: string) { set('langs', d.langs.filter(l => l.id !== id)) }
-  function setLang(id: string, f: keyof Lang, v: string | number) { set('langs', d.langs.map(l => l.id === id ? { ...l, [f]: v } : l)) }
+  function addLang()  { set('langs',  [...d.langs,  { id: uid(), name: '', level: 3 }]) }
+  function delLang(id: string)  { set('langs',  d.langs.filter(l => l.id !== id)) }
+  function setLang(id: string, f: keyof Lang, v: string | number) { set('langs',  d.langs.map(l => l.id === id ? { ...l, [f]: v } : l)) }
+
+  function addInterest()  { set('interests', [...d.interests, { id: uid(), name: '', icon: 'book' }]) }
+  function delInterest(id: string) { set('interests', d.interests.filter(i => i.id !== id)) }
+  function setInterest(id: string, f: keyof Interest, v: string) { set('interests', d.interests.map(i => i.id === id ? { ...i, [f]: v } : i)) }
 
   const CVDoc = template === 'blue' ? CVDocumentBlue : CVDocumentGreen
 
@@ -830,6 +948,29 @@ function CVForm({ d, setD, template, lang }: {
         <div className="flex flex-col gap-4">
 
           <FormSection title={t.sPersonal}>
+            {/* Photo */}
+            <div className="mb-5">
+              <label className={labelCls}>{t.photo}</label>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full border-2 border-dashed border-border flex items-center justify-center overflow-hidden bg-surface shrink-0">
+                  {d.photo
+                    ? <img src={d.photo} alt="" className="w-full h-full object-cover" />
+                    : <span className="text-xl font-bold text-ink-400">{initials}</span>
+                  }
+                </div>
+                <div className="flex flex-col gap-2">
+                  <input type="file" accept="image/*" onChange={handlePhoto}
+                    className="text-xs text-ink-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-100 file:text-emerald-700 hover:file:bg-emerald-200 file:cursor-pointer file:transition-colors" />
+                  {d.photo && (
+                    <button type="button" onClick={() => set('photo', '')}
+                      className="text-xs text-red-500 hover:text-red-700 text-left transition-colors">
+                      {t.removePhoto}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>{t.firstName}</label>
@@ -997,12 +1138,12 @@ function CVForm({ d, setD, template, lang }: {
           )}
 
           <FormSection title={t.sLangs}>
-            {d.langs.map(lang => (
-              <div key={lang.id} className="flex items-center gap-3 mb-3">
+            {d.langs.map(l => (
+              <div key={l.id} className="flex items-center gap-3 mb-3">
                 <input className={inputCls} type="text" placeholder={t.langName}
-                  value={lang.name} onChange={e => setLang(lang.id, 'name', e.target.value)} />
-                <StarLevel level={lang.level} onChange={n => setLang(lang.id, 'level', n)} />
-                <button type="button" onClick={() => delLang(lang.id)} className="shrink-0 text-ink-500 hover:text-red-500 transition-colors">
+                  value={l.name} onChange={e => setLang(l.id, 'name', e.target.value)} />
+                <StarLevel level={l.level} onChange={n => setLang(l.id, 'level', n)} />
+                <button type="button" onClick={() => delLang(l.id)} className="shrink-0 text-ink-500 hover:text-red-500 transition-colors">
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                 </button>
               </div>
@@ -1011,8 +1152,17 @@ function CVForm({ d, setD, template, lang }: {
           </FormSection>
 
           <FormSection title={t.sInterests}>
-            <textarea className={inputCls + ' resize-none'} rows={2}
-              value={d.interests} onChange={e => set('interests', e.target.value)} />
+            {d.interests.map((interest, i) => (
+              <div key={interest.id} className="flex items-center gap-3 mb-3">
+                <IconPicker value={interest.icon} onChange={icon => setInterest(interest.id, 'icon', icon)} />
+                <input className={inputCls} type="text" placeholder={`${t.interestName} ${i + 1}`}
+                  value={interest.name} onChange={e => setInterest(interest.id, 'name', e.target.value)} />
+                <button type="button" onClick={() => delInterest(interest.id)} className="shrink-0 text-ink-500 hover:text-red-500 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                </button>
+              </div>
+            ))}
+            <AddBtn onClick={addInterest} label={t.addInterest} />
           </FormSection>
         </div>
 
@@ -1068,19 +1218,16 @@ export default function CVPage() {
         }
       `}</style>
 
-      {/* Print-only */}
       <div className="cv-print-only" aria-hidden="true">
         <CVDoc d={d} lang={lang} />
       </div>
 
-      {/* Screen UI */}
       <div className="cv-no-print flex flex-col min-h-screen">
         <Header />
 
         <main className="flex-1 bg-surface pb-28 xl:pb-0">
           <div className="w-full max-w-300 mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
 
-            {/* Back link */}
             <Link href="/" className="inline-flex items-center gap-1.5 text-ink-500 text-xs hover:text-emerald-700 transition-colors mb-8">
               <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
                 <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1088,7 +1235,6 @@ export default function CVPage() {
               Retour à l&apos;accueil
             </Link>
 
-            {/* Steps progress indicator */}
             {step === 'form' && (
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-1">
@@ -1115,7 +1261,6 @@ export default function CVPage() {
 
         <Footer />
 
-        {/* Mobile fixed download bar — only on form step */}
         {step === 'form' && (
           <div className="xl:hidden fixed bottom-0 inset-x-0 bg-white border-t border-border px-4 py-3.5 z-40">
             <button type="button" onClick={() => window.print()}
