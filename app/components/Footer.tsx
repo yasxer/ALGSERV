@@ -1,75 +1,254 @@
 import Link from "next/link";
 
-export default function Footer() {
+type LangKey = "fr" | "ar" | "en";
+
+interface FooterProps {
+  lang?: LangKey;
+}
+
+const ICONS = {
+  phone: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+    </svg>
+  ),
+  email: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2"/>
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+    </svg>
+  ),
+  delivery: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  ),
+  privacy: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  ),
+  payment: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+      <line x1="1" y1="10" x2="23" y2="10"/>
+    </svg>
+  ),
+  support: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  )
+};
+
+const T = {
+  fr: {
+    desc: "Votre plateforme de services numériques en Algérie. Documents professionnels livrés depuis chez vous — sans files d'attente.",
+    services: "Services",
+    navigation: "Navigation",
+    home: "Accueil",
+    servicesAnchor: "Services",
+    howItWorks: "Comment ça marche",
+    contact: "Contact",
+    cv: "CV professionnel",
+    facture: "Facture",
+    visa: "Visa — bientôt",
+    autoEntr: "Auto-entrepreneur — bientôt",
+    rights: "Tous droits réservés.",
+    securePay: "Paiement sécurisé · CIB & Edahabia",
+    trust: [
+      {
+        title: "Livraison instantanée",
+        desc: "Téléchargement direct après paiement",
+        icon: ICONS.delivery,
+      },
+      {
+        title: "Confidentialité totale",
+        desc: "Nous protégeons vos données",
+        icon: ICONS.privacy,
+      },
+      {
+        title: "Paiement 100% sécurisé",
+        desc: "Transactions cryptées & protégées",
+        icon: ICONS.payment,
+      },
+      {
+        title: "Support dédié",
+        desc: "Nous sommes là pour vous aider",
+        icon: ICONS.support,
+      },
+    ],
+  },
+  ar: {
+    desc: "منصتك المفضلة للخدمات الرقمية في الجزائر. وثائقك الإدارية والمهنية جاهزة من بيتك بدون طوابير.",
+    services: "الخدمات",
+    navigation: "التنقل",
+    home: "الرئيسية",
+    servicesAnchor: "الخدمات",
+    howItWorks: "كيف نعمل",
+    contact: "اتصل بنا",
+    cv: "السيرة الذاتية الاحترافية",
+    facture: "الفاتورة التجارية",
+    visa: "ملف التأشيرة — قريباً",
+    autoEntr: "المقاول الذاتي — قريباً",
+    rights: "جميع الحقوق محفوظة.",
+    securePay: "دفع آمن · الذهبية و CIB",
+    trust: [
+      {
+        title: "تسليم فوري",
+        desc: "تحميل مباشر بعد الدفع",
+        icon: ICONS.delivery,
+      },
+      {
+        title: "خصوصية تامة",
+        desc: "نحافظ على سرية بياناتك",
+        icon: ICONS.privacy,
+      },
+      {
+        title: "دفع آمن 100%",
+        desc: "جميع المدفوعات محمية بالكامل",
+        icon: ICONS.payment,
+      },
+      {
+        title: "دعم متواصل",
+        desc: "نحن هنا لمساعدتك دائماً",
+        icon: ICONS.support,
+      },
+    ],
+  },
+  en: {
+    desc: "Your digital services platform in Algeria. Administrative and professional documents ready from home — no queues.",
+    services: "Services",
+    navigation: "Navigation",
+    home: "Home",
+    servicesAnchor: "Services",
+    howItWorks: "How it works",
+    contact: "Contact",
+    cv: "Professional CV",
+    facture: "Invoice",
+    visa: "Visa — coming soon",
+    autoEntr: "Auto-entrepreneur — coming soon",
+    rights: "All rights reserved.",
+    securePay: "Secure Payment · CIB & Edahabia",
+    trust: [
+      {
+        title: "Instant Delivery",
+        desc: "Direct download after payment",
+        icon: ICONS.delivery,
+      },
+      {
+        title: "Full Privacy",
+        desc: "We protect your data privacy",
+        icon: ICONS.privacy,
+      },
+      {
+        title: "100% Secure Payment",
+        desc: "All transactions are protected",
+        icon: ICONS.payment,
+      },
+      {
+        title: "Dedicated Support",
+        desc: "We are always here to help",
+        icon: ICONS.support,
+      },
+    ],
+  },
+};
+
+export default function Footer({ lang = "fr" }: FooterProps) {
+  const t = T[lang];
+  const isRTL = lang === "ar";
+
   return (
-    <footer id="contact" className="w-full bg-ink-900 text-ink-500 border-t border-ink-700">
-      <div className="w-full max-w-300 mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-16 pb-8 md:pb-10">
+    <footer id="contact" className="w-full border-t border-[#1E293B]" style={{ background: "#0F172A" }}>
+      {/* Trust Badges Strip */}
+      <div className="w-full border-b border-[#1E293B] py-10 bg-[#0F172A]">
+        <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div 
+            className="grid grid-cols-2 lg:grid-cols-4 gap-8"
+            style={{ direction: isRTL ? "rtl" : "ltr" }}
+          >
+            {t.trust.map((item, idx) => (
+              <div key={idx} className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-500 shrink-0">
+                  {item.icon}
+                </div>
+                <div>
+                  <h4 className="text-white text-sm font-semibold mb-1">{item.title}</h4>
+                  <p className="text-slate-400 text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10 mb-8 md:mb-14">
-
+      {/* Main Footer Content */}
+      <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+        <div 
+          className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16"
+          style={{ direction: isRTL ? "rtl" : "ltr" }}
+        >
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-7 h-7 rounded-lg bg-emerald-700 flex items-center justify-center shrink-0">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 2h4v4H2zM8 2h4v4H8zM2 8h4v4H8zM2 8h4v4H2zM8 8h4v4H8z" fill="white" fillOpacity=".9"/>
-                </svg>
-              </span>
-              <span className="text-white font-semibold text-base">Khdmti</span>
+            <div className="mb-6">
+              <img src="/algserv-logo.jpg" alt="ALGSERV" className="h-10 w-auto object-contain brightness-0 invert" />
+              <p className="text-[10px] font-bold tracking-[0.2em] uppercase mt-2 text-blue-500">
+                Your Digital Services Platform
+              </p>
             </div>
-            <p className="text-sm leading-relaxed max-w-xs">
-              Vos documents administratifs professionnels, prêts depuis chez vous —
-              sans files d&apos;attente.
+            <p className="text-sm leading-relaxed text-slate-400 max-w-sm mb-6">
+              {t.desc}
             </p>
+            <div className="flex flex-wrap gap-2.5">
+              <a href="tel:+213XXXXXXXXX"
+                className="inline-flex items-center gap-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs px-4 py-2.5 rounded-full transition-all duration-200">
+                <span className="text-blue-500">{ICONS.phone}</span>
+                <span>+213 XX XX XX XX</span>
+              </a>
+              <a href="mailto:contact@algserv.dz"
+                className="inline-flex items-center gap-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs px-4 py-2.5 rounded-full transition-all duration-200">
+                <span className="text-blue-500">{ICONS.email}</span>
+                <span>contact@algserv.dz</span>
+              </a>
+            </div>
           </div>
 
-          {/* Services + Contact — 2 cols on mobile */}
-          <div className="grid grid-cols-2 gap-6 md:contents">
+          {/* Links */}
+          <div className="grid grid-cols-2 gap-8 md:contents">
             <div>
-              <p className="text-white font-semibold text-sm mb-3">Services</p>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/order/cv" className="hover:text-white transition-colors duration-200">
-                    CV professionnel
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/order/facture" className="hover:text-white transition-colors duration-200">
-                    Facture
-                  </Link>
-                </li>
-                <li className="text-slate-600 text-xs pt-1">Visa — bientôt</li>
-                <li className="text-slate-600 text-xs">Auto-ent. — bientôt</li>
+              <p className="text-white font-semibold text-sm mb-5">{t.services}</p>
+              <ul className="space-y-3.5 text-[14px] text-slate-400">
+                <li><Link href="/order/cv" className="hover:text-blue-500 transition-colors">{t.cv}</Link></li>
+                <li><Link href="/#services" className="hover:text-blue-500 transition-colors">{t.facture}</Link></li>
+                <li className="text-slate-600 text-xs pt-1">{t.visa}</li>
+                <li className="text-slate-600 text-xs">{t.autoEntr}</li>
               </ul>
             </div>
             <div>
-              <p className="text-white font-semibold text-sm mb-3">Contact</p>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="tel:+213XXXXXXXXX" className="hover:text-white transition-colors duration-200">
-                    +213 XX XX XX XX
-                  </a>
-                </li>
-                <li>
-                  <a href="mailto:contact@khdmti.dz" className="hover:text-white transition-colors duration-200 break-all">
-                    contact@khdmti.dz
-                  </a>
-                </li>
+              <p className="text-white font-semibold text-sm mb-5">{t.navigation}</p>
+              <ul className="space-y-3.5 text-[14px] text-slate-400">
+                <li><Link href="/" className="hover:text-blue-500 transition-colors">{t.home}</Link></li>
+                <li><Link href="/#services" className="hover:text-blue-500 transition-colors">{t.servicesAnchor}</Link></li>
+                <li><Link href="/#how-it-works" className="hover:text-blue-500 transition-colors">{t.howItWorks}</Link></li>
+                <li><Link href="/#contact" className="hover:text-blue-500 transition-colors">{t.contact}</Link></li>
               </ul>
             </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-ink-700 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <p>© {new Date().getFullYear()} Khdmti. Tous droits réservés.</p>
-          <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-            <span>Paiement sécurisé CIB · Edahabia</span>
+        {/* Bottom copyright */}
+        <div 
+          className="border-t border-[#1E293B] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500"
+          style={{ direction: isRTL ? "rtl" : "ltr" }}
+        >
+          <p>© {new Date().getFullYear()} ALGSERV. {t.rights}</p>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>{t.securePay}</span>
           </div>
         </div>
-
       </div>
     </footer>
   );

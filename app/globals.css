@@ -1,29 +1,37 @@
 @import "tailwindcss";
 
 @theme {
-  /* Dark — green-tinted ink (text, header, footer) */
-  --color-ink-900: #0C2B22;
-  --color-ink-700: #1A3A30;
-  --color-ink-500: #7A9B8A;     /* muted on dark surfaces */
-  --color-slate-600: #334155;   /* muted on light surfaces */
+  /* Primary — ALGSERV Navy (text, header, footer, serious surfaces) */
+  --color-ink-900: #0D1B3E;
+  --color-ink-800: #142248;
+  --color-ink-700: #1E3060;
+  --color-ink-600: #2E437A;
+  --color-ink-500: #6B80A8;
+  --color-ink-400: #8FA3C8;
 
-  /* Emerald — primary action (buttons, links, CTAs — keep scarce) */
-  --color-emerald-900: #064E3B;
-  --color-emerald-700: #0E7C5A;
-  --color-emerald-500: #10A37F;
-  --color-emerald-100: #D1FAE5;
+  /* Accent — Premium Cobalt Blue (CTAs, links, key actions) */
+  --color-blue-600: #2563EB;
+  --color-blue-500: #3B82F6;
+  --color-blue-100: #DBEAFE;
+  --color-blue-50: #EFF6FF;
+  
+  /* ALGSERV Teal (For secondary highlights/badges if needed) */
+  --color-emerald-900: #006B5E;
+  --color-emerald-700: #00A896;
+  --color-emerald-500: #00BCA8;
+  --color-emerald-100: #CCF0EC;
 
-  /* Copper — accent, very sparingly (thin rules, icons only) */
-  --color-copper-700: #9A4F2B;
-  --color-copper-500: #B86A3E;
-  --color-copper-100: #F5E6DC;
+  /* Neutrals — backgrounds & borders */
+  --color-white:   #FFFFFF;
+  --color-surface: #F3F7FF;
+  --color-border:  #DDE4F0;
 
-  /* Neutrals (~60% of the UI) */
-  --color-surface: #F7FAF9;
-  --color-border:  #E8EDEB;
+  /* Slate */
+  --color-slate-600: #334155;
 
-  /* Font */
+  /* Fonts */
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-arabic: var(--font-tajawal), system-ui, sans-serif;
 
   --radius-DEFAULT: 12px;
   --radius-sm: 8px;
@@ -42,11 +50,147 @@ html {
 
 body {
   background: #ffffff;
-  color: #0C2B22;
+  color: #0D1B3E;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overflow-x: clip;
   width: 100%;
+  font-family: var(--font-sans);
 }
+
+/* Dynamic Font & Direction Overrides */
+[dir="rtl"] body,
+[dir="rtl"] {
+  font-family: var(--font-tajawal), system-ui, sans-serif;
+}
+
+[dir="ltr"] body,
+[dir="ltr"] {
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+}
+
+/* ─── Premium Animations & Transitions ──────────────────────── */
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(37, 99, 235, 0.35); }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Staggered delay Utilites for entrance animations */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Custom smooth transitions for interactive elements */
+.transition-premium {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Scroll Reveal Animations (Intersection Observer) ───────── */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-fade {
+  opacity: 0;
+  transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-fade.visible {
+  opacity: 1;
+}
+
+/* Staggered delay modifiers for transitions */
+.transition-delay-100 { transition-delay: 100ms !important; }
+.transition-delay-200 { transition-delay: 200ms !important; }
+.transition-delay-300 { transition-delay: 300ms !important; }
+.transition-delay-400 { transition-delay: 400ms !important; }
+.transition-delay-500 { transition-delay: 500ms !important; }
