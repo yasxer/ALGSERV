@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { translations, LangKey } from "@/lib/i18n";
+import { useLang } from "@/lib/useLang";
 
 /* --- SVG Paths for Icons -------------------------------------- */
 const ICONS = {
@@ -40,6 +42,14 @@ const ICONS = {
       <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
       <line x1="8" y1="21" x2="16" y2="21" />
       <line x1="12" y1="17" x2="12" y2="21" />
+    </svg>
+  ),
+  receipt: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z" />
+      <line x1="8" y1="10" x2="16" y2="10" />
+      <line x1="8" y1="14" x2="16" y2="14" />
+      <line x1="8" y1="6" x2="10" y2="6" />
     </svg>
   ),
   digital: (
@@ -116,243 +126,22 @@ const ICONS = {
   )
 };
 
-/* --- Translation Dictionary ----------------------------------- */
-const T = {
-  fr: {
-    hero: {
-      badge: "Plateforme de services numériques · Algérie 🇩🇿",
-      title: "Tous vos services ",
-      titleAccent: "numériques",
-      titleEnd: " en une seule plateforme",
-      desc: "Nous vous offrons une large gamme de services numériques et administratifs en toute simplicité, rapidité et sécurité.",
-      bullet1: "Services professionnels",
-      bullet2: "Support rapide",
-      bullet3: "Sécurisé & fiable",
-      ctaPrimary: "Explorer les services",
-      ctaSecondary: "Comment ça marche ?",
-    },
-    categories: {
-      title: "Découvrez nos services",
-      subtitle: "Choisissez le service dont vous avez besoin et commandez en quelques clics.",
-      list: [
-        { slug: "cv", name: "Création de documents", desc: "Création de documents administratifs et professionnels.", color: "blue", active: true, icon: ICONS.document },
-        { slug: "professional", name: "Services professionnels", desc: "Création de sites web, designs et solutions techniques.", color: "indigo", active: false, icon: ICONS.professional },
-        { slug: "shopping", name: "Achats de l'étranger", desc: "Commandez de Amazon, AliExpress, livré en Algérie.", color: "orange", active: false, icon: ICONS.shopping },
-        { slug: "business", name: "Services d'affaires", desc: "Accompagnement et services aux entrepreneurs.", color: "emerald", active: false, icon: ICONS.business },
-        { slug: "visa", name: "Visas et voyage", desc: "Préparation des formulaires et dossiers consulaires.", color: "purple", active: false, icon: ICONS.visa },
-        { slug: "digital", name: "Produits numériques", desc: "E-books, guides et modèles prêts à l'emploi.", color: "rose", active: false, icon: ICONS.digital },
-      ],
-      comingSoon: "Bientôt disponible",
-      orderNow: "Commander",
-    },
-    featured: {
-      breadcrumb: "Accueil > Documents > Générateur de CV Professionnel",
-      title: "منشئ السيرة الذاتية الاحترافي (CV Builder)",
-      desc: "Créez votre CV professionnel en quelques minutes avec des designs modernes adaptés au marché local et international. Facile à utiliser, éditable et téléchargeable au format PDF.",
-      badges: [
-        "Téléchargement immédiat",
-        "Modification facile",
-        "Trois langues (AR/FR/EN)",
-        "Modèles modernes & prêts",
-      ],
-      requiredFiles: "Documents requis",
-      files: [
-        { name: "Photo d'identité (optionnel)", ext: "JPG, PNG" },
-        { name: "Diplômes & certificats (optionnel)", ext: "PDF, JPG" },
-        { name: "Autre document (optionnel)", ext: "PDF, JPG, PNG" },
-      ],
-      termsTitle: "Conditions d'utilisation",
-      terms: [
-        "Les informations fournies doivent être exactes",
-        "Le formulaire doit être rempli en entier",
-        "Service à usage strictement personnel",
-        "Non remboursable après confirmation",
-      ],
-      previewTitle: "Sélectionnez votre modèle",
-      templateNames: {
-        blue: "Modèle Bleu Royal",
-        green: "Modèle Vert Émeraude",
-        grey: "Modèle Gris Minimaliste",
-        more: "+10 autres designs",
-      },
-      cta: "Commencer mon CV maintenant",
-    },
-    steps: {
-      title: "Comment ça marche ?",
-      subtitle: "De votre canapé à votre document professionnel — en 5 étapes simples.",
-      list: [
-        { step: "Étape 01", title: "Modèle idéal", desc: "Parcourez et choisissez le modèle de votre choix." },
-        { step: "Étape 02", title: "Entrer les infos", desc: "Remplissez notre formulaire guidé en ligne." },
-        { step: "Étape 03", title: "Aperçu en direct", desc: "Révisez et apportez vos corrections en temps réel." },
-        { step: "Étape 04", title: "Régler en ligne", desc: "Payez en toute sécurité par CIB ou Edahabia." },
-        { step: "Étape 05", title: "Télécharger", desc: "Votre PDF professionnel est prêt à être téléchargé." },
-      ],
-    },
-    ctaBanner: {
-      title: "Prêt à créer votre document professionnel ?",
-      subtitle: "Commencez dès maintenant. Paiement sécurisé avec CIB et Edahabia.",
-      button: "Commencer maintenant",
-    },
-  },
-  ar: {
-    hero: {
-      badge: "منصة الخدمات الرقمية في الجزائر 🇩🇿",
-      title: "كل خدماتك ",
-      titleAccent: "الرقمية",
-      titleEnd: " في منصة واحدة",
-      desc: "نوفر لك مجموعة واسعة من الخدمات الرقمية والإدارية بسهولة، سرعة وأمان تام.",
-      bullet1: "خدمات احترافية",
-      bullet2: "دعم سريع",
-      bullet3: "موثوق وآمن",
-      ctaPrimary: "استكشف الخدمات",
-      ctaSecondary: "كيف نعمل؟",
-    },
-    categories: {
-      title: "اكتشف خدماتنا",
-      subtitle: "اختر القسم الذي تريد وابدأ طلب خدمتك الآن بكل سهولة.",
-      list: [
-        { slug: "cv", name: "المستندات", desc: "إنشاء المستندات الإدارية والسيرة الذاتية الاحترافية بسهولة.", color: "blue", active: true, icon: ICONS.document },
-        { slug: "professional", name: "خدمات احترافية", desc: "خدمات تقنية وتطوير المواقع والتصميم الاحترافي.", color: "indigo", active: false, icon: ICONS.professional },
-        { slug: "shopping", name: "التسوق من الخارج", desc: "شراء المنتجات من أشهر المتاجر العالمية مع التوصيل.", color: "orange", active: false, icon: ICONS.shopping },
-        { slug: "business", name: "خدمات الأعمال", desc: "خدمات موجهة لأصحاب المشاريع والأعمال والشركات.", color: "emerald", active: false, icon: ICONS.business },
-        { slug: "visa", name: "التأشيرات والسفر", desc: "خدمات التأشيرات وحجز المواعيد والملفات الرسمية.", color: "purple", active: false, icon: ICONS.visa },
-        { slug: "digital", name: "المنتجات الرقمية", desc: "قوالب جاهزة، كتب إلكترونية، ومنتجات رقمية متنوعة.", color: "rose", active: false, icon: ICONS.digital },
-      ],
-      comingSoon: "بientôt disponible / قريباً",
-      orderNow: "طلب الخدمة",
-    },
-    featured: {
-      breadcrumb: "الرئيسية > المستندات > منشئ السيرة الذاتية الاحترافي",
-      title: "منشئ السيرة الذاتية الاحترافي (CV Builder)",
-      desc: "أنشئ سيرتك الذاتية الاحترافية في دقائق وبأحدث التصاميم التي تناسب سوق العمل المحلي والدولي. سهل الاستخدام وقابل للتعديل وللتحميل بصيغة PDF.",
-      badges: [
-        "تحميل فوري",
-        "تعديل سهل وسريع",
-        "ثلاث لغات (عربي/فرنسي/إنجليزي)",
-        "تصاميم احترافية جاهزة",
-      ],
-      requiredFiles: "الملفات المطلوبة",
-      files: [
-        { name: "صورة شخصية (اختياري)", ext: "JPG, PNG" },
-        { name: "الشهادات الدراسية (اختياري)", ext: "PDF, JPG" },
-        { name: "أي ملف إضافي (اختياري)", ext: "PDF, JPG, PNG" },
-      ],
-      termsTitle: "الشروط والضوابط",
-      terms: [
-        "جميع المعلومات المقدمة يجب أن تكون صحيحة",
-        "يجب إدخال المعلومات المطلوبة بالكامل",
-        "خدمة مخصصة للاستخدام الشخصي فقط",
-        "لا يمكن استرجاع المبلغ بعد إتمام الطلب",
-      ],
-      previewTitle: "اختر تصميمك المفضل من القوالب",
-      templateNames: {
-        blue: "قالب أزرق ملكي",
-        green: "قالب أخضر زمردي",
-        grey: "قالب رمادي كلاسيكي",
-        more: "+10 قوالب إضافية",
-      },
-      cta: "ابدأ إنشاء سيرتك الذاتية الآن",
-    },
-    steps: {
-      title: "كيف تعمل الخدمة ؟",
-      subtitle: "من منزلك إلى وثيقتك الجاهزة في 5 خطوات بسيطة.",
-      list: [
-        { step: "الخطوة 01", title: "اختر القالب المناسب", desc: "تصفح القوالب المتوفرة واختر ما يناسبك." },
-        { step: "الخطوة 02", title: "أدخل معلوماتك", desc: "املأ البيانات المطلوبة في النموذج بدقة." },
-        { step: "الخطوة 03", title: "معاينة وتعديل", desc: "راجع سيرتك الذاتية وقم بأي تعديلات في الحين." },
-        { step: "الخطوة 04", title: "ادفع الطلب", desc: "اختر طريقة الدفع المناسبة (الذهبية أو CIB)." },
-        { step: "الخطوة 05", title: "تحميل السيرة الذاتية", desc: "احصل على ملفك بصيغة PDF مباشرة بعد الدفع." },
-      ],
-    },
-    ctaBanner: {
-      title: "جاهز لإنشاء سيرتك الذاتية الاحترافية ؟",
-      subtitle: "ابدأ الآن واصنع سيرة ذاتية تميزك وتلفت انتباه الموظفين.",
-      button: "ابدأ الآن",
-    },
-  },
-  en: {
-    hero: {
-      badge: "Digital Services Platform · Algeria 🇩🇿",
-      title: "All your ",
-      titleAccent: "digital services",
-      titleEnd: " in one platform",
-      desc: "We offer a wide range of digital and administrative services with ease, speed, and complete security.",
-      bullet1: "Professional services",
-      bullet2: "Fast support",
-      bullet3: "Secure & reliable",
-      ctaPrimary: "Explore services",
-      ctaSecondary: "How it works?",
-    },
-    categories: {
-      title: "Discover our services",
-      subtitle: "Choose the service you need and order in a few clicks.",
-      list: [
-        { slug: "cv", name: "Documents", desc: "Create administrative and professional documents easily.", color: "blue", active: true, icon: ICONS.document },
-        { slug: "professional", name: "Professional Services", desc: "Web development, design, and technical services.", color: "indigo", active: false, icon: ICONS.professional },
-        { slug: "shopping", name: "Shopping from Abroad", desc: "Order from Amazon, AliExpress, delivered to Algeria.", color: "orange", active: false, icon: ICONS.shopping },
-        { slug: "business", name: "Business Services", desc: "Tailored services for entrepreneurs and business owners.", color: "emerald", active: false, icon: ICONS.business },
-        { slug: "visa", name: "Visa & Travel", desc: "Consular file preparation and appointment bookings.", color: "purple", active: false, icon: ICONS.visa },
-        { slug: "digital", name: "Digital Products", desc: "Premium templates, e-books, and tools ready to use.", color: "rose", active: false, icon: ICONS.digital },
-      ],
-      comingSoon: "Coming Soon",
-      orderNow: "Order Now",
-    },
-    featured: {
-      breadcrumb: "Home > Documents > Professional CV Builder",
-      title: "منشئ السيرة الذاتية الاحترافي (CV Builder)",
-      desc: "Create your professional CV in minutes with modern designs tailored to local and international job markets. Easy to use, editable, and downloadable as PDF.",
-      badges: [
-        "Instant Download",
-        "Easy & Fast Editing",
-        "Three Languages (AR/FR/EN)",
-        "Ready Professional Designs",
-      ],
-      requiredFiles: "Required Files",
-      files: [
-        { name: "Personal Photo (optional)", ext: "JPG, PNG" },
-        { name: "Certificates (optional)", ext: "PDF, JPG" },
-        { name: "Additional File (optional)", ext: "PDF, JPG, PNG" },
-      ],
-      termsTitle: "Terms & Conditions",
-      terms: [
-        "All provided information must be correct",
-        "Required information must be fully entered",
-        "Service for personal use only",
-        "Non-refundable after order completion",
-      ],
-      previewTitle: "Select your favorite template layout",
-      templateNames: {
-        blue: "Royal Blue Layout",
-        green: "Emerald Green Layout",
-        grey: "Minimalist Grey Layout",
-        more: "+10 more designs",
-      },
-      cta: "Start creating my CV now",
-    },
-    steps: {
-      title: "How does it work?",
-      subtitle: "From your couch to your ready document in 5 simple steps.",
-      list: [
-        { step: "Step 01", title: "Select template", desc: "Browse available layouts and choose your favorite." },
-        { step: "Step 02", title: "Enter your info", desc: "Fill in the required fields in the form." },
-        { step: "Step 03", title: "Preview & edit", desc: "Review your CV and make edits in real-time." },
-        { step: "Step 04", title: "Pay for order", desc: "Choose your payment method (Edahabia or CIB)." },
-        { step: "Step 05", title: "Download CV", desc: "Get your PDF file instantly after payment." },
-      ],
-    },
-    ctaBanner: {
-      title: "Ready to create your professional CV?",
-      subtitle: "Start now and make a CV that stands out to recruiters.",
-      button: "Start Now",
-    },
-  },
-};
+/* --- Services config (icons + layout, not translatable) ------- */
+const SERVICES_CONFIG = [
+  { slug: "cv",           color: "blue",    active: true,  icon: ICONS.document,     href: "/order/documents" },
+  { slug: "professional", color: "indigo",  active: false, icon: ICONS.professional, href: "#"               },
+  { slug: "shopping",     color: "orange",  active: false, icon: ICONS.shopping,     href: "#"               },
+  { slug: "business",     color: "emerald", active: false, icon: ICONS.business,     href: "#"               },
+  { slug: "visa",         color: "purple",  active: false, icon: ICONS.visa,         href: "#"               },
+  { slug: "digital",      color: "rose",    active: false, icon: ICONS.digital,      href: "#"               },
+];
 
 export default function Home() {
-  const [lang, setLang] = useState<"ar" | "fr" | "en">("ar");
+  const [lang, setLang] = useLang('ar');
   const [activeTemplate, setActiveTemplate] = useState<"blue" | "green" | "grey">("blue");
 
-  const t = T[lang];
+  const tl = translations[lang];
+  const t = tl.home;
   const isRTL = lang === "ar";
 
   /* --- Viewport Scroll Observer Hook -------------------------- */
@@ -475,10 +264,10 @@ export default function Home() {
                       {/* Mock Screen Content Body */}
                       <div className="flex-1 flex flex-col justify-center">
                         <div className="text-center font-bold text-slate-800 text-[10px] sm:text-xs mb-1.5 leading-tight">
-                          {isRTL ? "مرحباً بك في منصة الخدمات الرقمية" : "Bienvenue sur ALGSERV"}
+                          {lang === 'ar' ? "مرحباً بك في منصة الخدمات الرقمية" : lang === 'fr' ? "Bienvenue sur ALGSERV" : "Welcome to ALGSERV"}
                         </div>
                         <div className="w-32 sm:w-44 h-4 bg-slate-200/80 rounded-lg mx-auto mb-3 border border-slate-300/40 flex items-center px-1.5 justify-start text-[6px] sm:text-[8px] text-slate-400">
-                          🔍 {isRTL ? "ابحث عن خدمة..." : "Rechercher..."}
+                          🔍 {lang === 'ar' ? "ابحث عن خدمة..." : lang === 'fr' ? "Rechercher..." : "Search for a service..."}
                         </div>
                         
                         {/* Mini Cards Grid */}
@@ -530,7 +319,7 @@ export default function Home() {
                         <div className="h-1.5 w-5/6 bg-slate-300 rounded-xs" />
                         <div className="h-1 w-2/3 bg-slate-200 rounded-xs" />
                         <div className="mt-auto h-2.5 w-full bg-blue-600 rounded-xs flex items-center justify-center text-white font-bold text-[4px] sm:text-[6px]">
-                          {isRTL ? "تحميل PDF" : "Télécharger"}
+                          {lang === 'ar' ? "تحميل PDF" : lang === 'fr' ? "Télécharger" : "Download"}
                         </div>
                       </div>
                     </div>
@@ -543,7 +332,7 @@ export default function Home() {
                     </div>
                     <div className="flex flex-col text-[10px] leading-none">
                       <span className="font-bold text-slate-800">CV.pdf</span>
-                      <span className="text-slate-400 mt-1">100% {isRTL ? "مكتمل" : "Prêt"}</span>
+                      <span className="text-slate-400 mt-1">100% {lang === 'ar' ? "مكتمل" : lang === 'fr' ? "Prêt" : "Ready"}</span>
                     </div>
                   </div>
                 </div>
@@ -562,7 +351,7 @@ export default function Home() {
             {/* Header */}
             <div className="text-center mb-16 max-w-xl mx-auto reveal-up">
               <span className="inline-block text-xs font-bold uppercase tracking-widest px-4.5 py-2 rounded-full mb-4 bg-blue-50 text-blue-600">
-                {isRTL ? "أقسام الخدمات" : "Catalogue"}
+                {lang === 'ar' ? "أقسام الخدمات" : lang === 'en' ? "Services" : "Catalogue"}
               </span>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-ink-900 mb-4 tracking-tight">
                 {t.categories.title}
@@ -574,12 +363,13 @@ export default function Home() {
 
             {/* Grid of Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {t.categories.list.map((srv, idx) => (
-                srv.active ? (
+              {SERVICES_CONFIG.map((cfg, idx) => {
+              const srv = { ...cfg, ...t.categories.list[idx] }
+              return srv.active ? (
                   /* Active Service Card */
-                  <Link 
-                    key={srv.slug} 
-                    href="#featured-cv"
+                  <Link
+                    key={srv.slug}
+                    href={srv.href}
                     className={`group relative bg-white rounded-3xl border border-slate-200 p-8 shadow-[0_4px_20px_rgba(0,0,0,0.01)] transition-premium hover:shadow-xl hover:translate-y-[-6px] hover:border-blue-600 flex flex-col justify-between overflow-hidden reveal-up
                       ${idx === 0 ? "transition-delay-100" : idx === 1 ? "transition-delay-200" : "transition-delay-300"}`}
                   >
@@ -590,7 +380,7 @@ export default function Home() {
                       {/* Badge */}
                       <div className="absolute top-5 right-5 text-[10px] font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 flex items-center gap-1">
                         <span className="text-emerald-500">{ICONS.stars}</span>
-                        <span>{isRTL ? "نشط" : "Actif"}</span>
+                        <span>{t.categories.active}</span>
                       </div>
 
                       {/* Icon container */}
@@ -614,9 +404,9 @@ export default function Home() {
                       </span>
                     </div>
                   </Link>
-                ) : (
+              ) : (
                   /* Disabled "Coming soon" Card */
-                  <div 
+                  <div
                     key={srv.slug}
                     className={`relative bg-slate-50/50 rounded-3xl border border-slate-200/70 p-8 opacity-75 flex flex-col justify-between reveal-up
                       ${idx === 3 ? "transition-delay-100" : idx === 4 ? "transition-delay-200" : "transition-delay-300"}`}
@@ -642,18 +432,18 @@ export default function Home() {
                     <div className="pt-6 border-t border-slate-100/60">
                       <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-slate-100 text-slate-500 px-4 py-2 rounded-xl">
                         <span className="text-slate-400">{ICONS.clock}</span>
-                        <span>{srv.name === "الفاتورة التجارية" ? "Bientôt / قريباً" : t.categories.comingSoon}</span>
+                        <span>{t.categories.comingSoon}</span>
                       </span>
                     </div>
                   </div>
-                )
-              ))}
+              )
+            })}
             </div>
           </div>
         </section>
 
         {/* ---------------------------------------------------
-            FEATURED SERVICE SECTION (CV BUILDER)
+            FEATURED DOCUMENTS SECTION
         --------------------------------------------------- */}
         <section id="featured-cv" className="w-full py-20 md:py-28 bg-slate-50/40 border-y border-slate-100">
           <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -722,12 +512,21 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Primary Button */}
-                <Link href="/order/cv"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 text-white bg-blue-600 hover:bg-blue-700 font-bold px-10 py-4.5 rounded-xl text-base transition-all shadow-md shadow-blue-600/10 hover:translate-y-[-2px] hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
-                  {t.featured.cta}
-                  {isRTL ? ICONS.arrowLeft : ICONS.arrowRight}
-                </Link>
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link href="/order/cv"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-white bg-blue-600 hover:bg-blue-700 font-bold px-7 py-4 rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 hover:translate-y-[-2px] hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    {t.featured.ctaCV}
+                    {isRTL ? ICONS.arrowLeft : ICONS.arrowRight}
+                  </Link>
+                  <Link href="/order/facture"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 font-bold px-7 py-4 rounded-xl text-sm transition-all hover:translate-y-[-2px] hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+                    {t.featured.ctaFacture}
+                    {isRTL ? ICONS.arrowLeft : ICONS.arrowRight}
+                  </Link>
+                </div>
               </div>
 
               {/* Right Column: CSS Mockup preview and Gallery */}
@@ -746,7 +545,7 @@ export default function Home() {
                         ${activeTemplate === "blue" ? "bg-[#1B4F8C]" : activeTemplate === "green" ? "bg-[#0E7C5A]" : "bg-slate-900"}`}>
                         <div className="flex flex-col gap-0.5">
                           <div className="font-bold text-[8px] sm:text-[10px] tracking-wide">AMINE BENMOHAMED</div>
-                          <div className="opacity-85 text-[6px] sm:text-[7.5px] font-medium">{isRTL ? "مهندس برمجيات" : "Ingénieur Logiciel"}</div>
+                          <div className="opacity-85 text-[6px] sm:text-[7.5px] font-medium">{lang === 'ar' ? "مهندس برمجيات" : lang === 'fr' ? "Ingénieur Logiciel" : "Software Engineer"}</div>
                         </div>
                         <div className="w-6 h-6 rounded-full bg-slate-100/25 border border-white/20 flex items-center justify-center font-bold text-[8px]">
                           AB
@@ -803,7 +602,7 @@ export default function Home() {
                               {isRTL ? "التعليم" : "EDUCATION"}
                             </div>
                             <div className="flex justify-between font-bold text-slate-800 text-[6.5px] sm:text-[7.5px]">
-                              <span>{isRTL ? "ماستر إعلام آلي" : "Master Informatique"}</span>
+                              <span>{lang === 'ar' ? "ماستر إعلام آلي" : lang === 'fr' ? "Master Informatique" : "Master in Computer Science"}</span>
                               <span className="text-[5.5px] sm:text-[6.5px] font-normal text-slate-400">USTHB · 2022</span>
                             </div>
                           </div>
@@ -899,6 +698,25 @@ export default function Home() {
                   </div>
 
                 </div>
+
+                {/* Facture mini chip */}
+                <Link href="/order/facture" className="mt-5 w-full max-w-[400px] flex items-center gap-3 bg-white border border-emerald-100 hover:border-emerald-400 rounded-2xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 group">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-ink-900 group-hover:text-emerald-700 transition-colors">
+                      {isRTL ? "الفاتورة التجارية" : lang === "fr" ? "Facture Commerciale" : "Commercial Invoice"}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      {isRTL ? "فاتورة جزائرية كلاسيكية ← PDF" : lang === "fr" ? "Facture algérienne classique ← PDF" : "Classic Algerian invoice ← PDF"}
+                    </span>
+                  </div>
+                  <span className="ms-auto text-emerald-500 group-hover:translate-x-1 transition-transform">
+                    {isRTL ? ICONS.arrowLeft : ICONS.arrowRight}
+                  </span>
+                </Link>
+
               </div>
 
             </div>
@@ -914,7 +732,7 @@ export default function Home() {
             {/* Header */}
             <div className="text-center mb-16 max-w-xl mx-auto reveal-up">
               <span className="inline-block text-xs font-bold uppercase tracking-widest px-4.5 py-2 rounded-full mb-4 bg-blue-50 text-blue-600">
-                {isRTL ? "آلية العمل" : "Processus"}
+                {lang === 'ar' ? "آلية العمل" : lang === 'en' ? "Process" : "Processus"}
               </span>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-ink-900 mb-4 tracking-tight">
                 {t.steps.title}
@@ -1002,7 +820,7 @@ export default function Home() {
 
       </main>
 
-      <Footer lang={lang} />
+      <Footer lang={lang as LangKey} />
     </div>
   );
 }

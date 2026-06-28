@@ -1,6 +1,5 @@
 import Link from "next/link";
-
-type LangKey = "fr" | "ar" | "en";
+import { translations, LangKey } from "@/lib/i18n";
 
 interface FooterProps {
   lang?: LangKey;
@@ -42,122 +41,10 @@ const ICONS = {
   )
 };
 
-const T = {
-  fr: {
-    desc: "Votre plateforme de services numériques en Algérie. Documents professionnels livrés depuis chez vous — sans files d'attente.",
-    services: "Services",
-    navigation: "Navigation",
-    home: "Accueil",
-    servicesAnchor: "Services",
-    howItWorks: "Comment ça marche",
-    contact: "Contact",
-    cv: "CV professionnel",
-    facture: "Facture",
-    visa: "Visa — bientôt",
-    autoEntr: "Auto-entrepreneur — bientôt",
-    rights: "Tous droits réservés.",
-    securePay: "Paiement sécurisé · CIB & Edahabia",
-    trust: [
-      {
-        title: "Livraison instantanée",
-        desc: "Téléchargement direct après paiement",
-        icon: ICONS.delivery,
-      },
-      {
-        title: "Confidentialité totale",
-        desc: "Nous protégeons vos données",
-        icon: ICONS.privacy,
-      },
-      {
-        title: "Paiement 100% sécurisé",
-        desc: "Transactions cryptées & protégées",
-        icon: ICONS.payment,
-      },
-      {
-        title: "Support dédié",
-        desc: "Nous sommes là pour vous aider",
-        icon: ICONS.support,
-      },
-    ],
-  },
-  ar: {
-    desc: "منصتك المفضلة للخدمات الرقمية في الجزائر. وثائقك الإدارية والمهنية جاهزة من بيتك بدون طوابير.",
-    services: "الخدمات",
-    navigation: "التنقل",
-    home: "الرئيسية",
-    servicesAnchor: "الخدمات",
-    howItWorks: "كيف نعمل",
-    contact: "اتصل بنا",
-    cv: "السيرة الذاتية الاحترافية",
-    facture: "الفاتورة التجارية",
-    visa: "ملف التأشيرة — قريباً",
-    autoEntr: "المقاول الذاتي — قريباً",
-    rights: "جميع الحقوق محفوظة.",
-    securePay: "دفع آمن · الذهبية و CIB",
-    trust: [
-      {
-        title: "تسليم فوري",
-        desc: "تحميل مباشر بعد الدفع",
-        icon: ICONS.delivery,
-      },
-      {
-        title: "خصوصية تامة",
-        desc: "نحافظ على سرية بياناتك",
-        icon: ICONS.privacy,
-      },
-      {
-        title: "دفع آمن 100%",
-        desc: "جميع المدفوعات محمية بالكامل",
-        icon: ICONS.payment,
-      },
-      {
-        title: "دعم متواصل",
-        desc: "نحن هنا لمساعدتك دائماً",
-        icon: ICONS.support,
-      },
-    ],
-  },
-  en: {
-    desc: "Your digital services platform in Algeria. Administrative and professional documents ready from home — no queues.",
-    services: "Services",
-    navigation: "Navigation",
-    home: "Home",
-    servicesAnchor: "Services",
-    howItWorks: "How it works",
-    contact: "Contact",
-    cv: "Professional CV",
-    facture: "Invoice",
-    visa: "Visa — coming soon",
-    autoEntr: "Auto-entrepreneur — coming soon",
-    rights: "All rights reserved.",
-    securePay: "Secure Payment · CIB & Edahabia",
-    trust: [
-      {
-        title: "Instant Delivery",
-        desc: "Direct download after payment",
-        icon: ICONS.delivery,
-      },
-      {
-        title: "Full Privacy",
-        desc: "We protect your data privacy",
-        icon: ICONS.privacy,
-      },
-      {
-        title: "100% Secure Payment",
-        desc: "All transactions are protected",
-        icon: ICONS.payment,
-      },
-      {
-        title: "Dedicated Support",
-        desc: "We are always here to help",
-        icon: ICONS.support,
-      },
-    ],
-  },
-};
+const TRUST_ICONS = [ICONS.delivery, ICONS.privacy, ICONS.payment, ICONS.support];
 
 export default function Footer({ lang = "fr" }: FooterProps) {
-  const t = T[lang];
+  const t = translations[lang].footer;
   const isRTL = lang === "ar";
 
   return (
@@ -172,7 +59,7 @@ export default function Footer({ lang = "fr" }: FooterProps) {
             {t.trust.map((item, idx) => (
               <div key={idx} className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-500 shrink-0">
-                  {item.icon}
+                  {TRUST_ICONS[idx]}
                 </div>
                 <div>
                   <h4 className="text-white text-sm font-semibold mb-1">{item.title}</h4>
@@ -221,7 +108,7 @@ export default function Footer({ lang = "fr" }: FooterProps) {
               <p className="text-white font-semibold text-sm mb-5">{t.services}</p>
               <ul className="space-y-3.5 text-[14px] text-slate-400">
                 <li><Link href="/order/cv" className="hover:text-blue-500 transition-colors">{t.cv}</Link></li>
-                <li><Link href="/#services" className="hover:text-blue-500 transition-colors">{t.facture}</Link></li>
+                <li><Link href="/order/facture" className="hover:text-blue-500 transition-colors">{t.facture}</Link></li>
                 <li className="text-slate-600 text-xs pt-1">{t.visa}</li>
                 <li className="text-slate-600 text-xs">{t.autoEntr}</li>
               </ul>

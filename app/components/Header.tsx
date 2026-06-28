@@ -2,47 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
-
-type LangKey = "fr" | "ar" | "en";
+import { translations, LangKey } from "@/lib/i18n";
 
 interface HeaderProps {
   lang?: LangKey;
   onLangChange?: (lang: LangKey) => void;
 }
 
-const T = {
-  fr: {
-    home: "Accueil",
-    services: "Services",
-    digitalProducts: "Produits Numériques",
-    about: "À propos",
-    contact: "Contact",
-    login: "Connexion",
-    register: "Créer un compte",
-  },
-  ar: {
-    home: "الرئيسية",
-    services: "الخدمات",
-    digitalProducts: "المنتجات الرقمية",
-    about: "من نحن",
-    contact: "اتصل بنا",
-    login: "تسجيل الدخول",
-    register: "إنشاء حساب",
-  },
-  en: {
-    home: "Home",
-    services: "Services",
-    digitalProducts: "Digital Products",
-    about: "About Us",
-    contact: "Contact",
-    login: "Log In",
-    register: "Create Account",
-  },
-};
-
 export default function Header({ lang = "fr", onLangChange }: HeaderProps) {
   const [open, setOpen] = useState(false);
-  const t = T[lang];
+  const t = translations[lang].header;
   const isRTL = lang === "ar";
 
   const languages: LangKey[] = ["ar", "fr", "en"];
