@@ -366,7 +366,7 @@ function CVDocumentBlue({ d, lang }: { d: CVData; lang: LangKey }) {
   const initials = [d.firstName?.[0], d.lastName?.[0]].filter(Boolean).join('').toUpperCase() || '?'
 
   return (
-    <div style={{ width: '210mm', minHeight: '297mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: BODY, background: 'white', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '210mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: BODY, background: 'white', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
       <div style={{ padding: `${hdrPad}px 28px`, display: 'flex', alignItems: 'flex-start', gap: '18px', flexDirection: isRTL ? 'row-reverse' : 'row', borderBottom: '1px solid #E2E8F0' }}>
@@ -528,6 +528,12 @@ function CVDocumentBlue({ d, lang }: { d: CVData; lang: LangKey }) {
           )}
         </div>
       </div>
+
+      {/* CV footer bar */}
+      <div style={{ padding: '7px 28px', borderTop: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: SBG, flexShrink: 0 }}>
+        <span style={{ fontSize: '6pt', color: '#94a3b8', fontFamily }}>{fullName}</span>
+        <span style={{ fontSize: '6pt', color: '#94a3b8', fontFamily, letterSpacing: '0.4px' }}>CV Professionnel · ALGSERV</span>
+      </div>
     </div>
   )
 }
@@ -577,7 +583,7 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
   }
 
   return (
-    <div style={{ width: '210mm', minHeight: '297mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: '#1a1a1a', background: 'white', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '210mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: '#1a1a1a', background: 'white', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
       <div style={{ background: 'linear-gradient(120deg, #064E3B 0%, #0E7C5A 100%)', padding: `${hdrPad}px 32px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
@@ -710,6 +716,12 @@ function CVDocumentGreen({ d, lang }: { d: CVData; lang: LangKey }) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* CV footer bar */}
+      <div style={{ padding: '7px 32px', borderTop: '1.5px solid #D1FAE5', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F7FAF9', flexShrink: 0 }}>
+        <span style={{ fontSize: '6pt', color: '#6b7280', fontFamily }}>{fullName}</span>
+        <span style={{ fontSize: '6pt', color: '#6b7280', fontFamily, letterSpacing: '0.4px' }}>CV Professionnel · ALGSERV</span>
       </div>
     </div>
   )
@@ -1212,7 +1224,7 @@ export default function CVPage() {
         @media print {
           .cv-no-print   { display: none !important; }
           .cv-print-only { display: flex !important; }
-          @page { margin: 0; size: A4 portrait; }
+          @page { margin: 0; size: auto; }
           body { background: white !important; overflow: visible !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
