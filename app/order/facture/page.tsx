@@ -168,8 +168,9 @@ export default function FacturePage() {
             <Link href="/" className="flex-1 sm:flex-initial text-center text-sm font-semibold border border-[#DDE4F0] rounded-xl px-5 py-3 bg-white text-ink-800 hover:bg-slate-50 transition-colors">
               {t.back}
             </Link>
-            <button onClick={() => window.print()} className="flex-1 sm:flex-initial text-center text-sm font-bold bg-blue-600 text-white rounded-xl px-7 py-3 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10 cursor-pointer">
-              🖨️ {t.print}
+            <button onClick={() => window.print()} className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-sm font-bold bg-blue-600 text-white rounded-xl px-7 py-3 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10 cursor-pointer">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              {t.print}
             </button>
           </div>
         </div>
@@ -182,7 +183,10 @@ export default function FacturePage() {
 
             {/* Template selector */}
             <div className="bg-white border border-[#DDE4F0] rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-              <h3 className="text-sm font-bold text-ink-900 border-b border-slate-100 pb-3">🎨 {t.chooseTemplate}</h3>
+              <h3 className="text-sm font-bold text-ink-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                {t.chooseTemplate}
+              </h3>
               <div className="grid grid-cols-3 gap-2">
                 {([
                   { id: 'classic', label: t.templateClassic },
@@ -200,7 +204,10 @@ export default function FacturePage() {
 
             {/* Form fields */}
             <div className="bg-white border border-[#DDE4F0] rounded-2xl p-5 shadow-sm flex flex-col gap-5">
-              <h3 className="text-sm font-bold text-ink-900 border-b border-slate-100 pb-3">📝 {t.fillForm}</h3>
+              <h3 className="text-sm font-bold text-ink-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                {t.fillForm}
+              </h3>
 
               {/* Émetteur */}
               <div className="flex flex-col gap-3">
@@ -324,7 +331,10 @@ export default function FacturePage() {
           {/* ---- RIGHT: Invoice Sheet ---- */}
           <div className="lg:col-span-7 flex flex-col items-center w-full sticky top-28 print:static print:w-full">
             <h3 className="print:hidden text-xs font-bold text-slate-400 mb-3 text-center flex items-center gap-1.5">
-              <span>📄 {t.preview}</span>
+              <span className="flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                {t.preview}
+              </span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             </h3>
 
@@ -635,7 +645,10 @@ export default function FacturePage() {
 
             {/* Print hint */}
             <div className="print:hidden mt-4 text-[11px] text-slate-400 max-w-[210mm] text-center w-full bg-slate-100/50 rounded-xl p-3 border border-slate-200/40">
-              💡 <strong>{t.printHint}</strong>
+              <span className="inline-flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <strong>{t.printHint}</strong>
+              </span>
             </div>
           </div>
 
