@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
@@ -469,11 +468,6 @@ export default function FacturePage() {
                         <p className="font-bold">{t.gerant}</p>
                       </div>
 
-                      {/* PDF Footer with logo */}
-                      <div className="mt-10 pt-3 border-t border-gray-300 flex items-center justify-between">
-                        <span className="text-[7pt] text-gray-400">Facture N° {data.invoiceNum} · {data.issuerName || 'ALGSERV'}</span>
-                        <Image src="/algserv-logo.jpg" alt="ALGSERV" width={50} height={20} className="object-contain opacity-50" style={{ height: '18px', width: 'auto' }} />
-                      </div>
 
                     </div>
                   )}
@@ -566,11 +560,6 @@ export default function FacturePage() {
                         <span className="font-bold">{t.amountInWords}</span>
                         <br /><span className="italic">{amountWords} {t.currencyFull}</span>
                       </div>
-                      {/* Footer */}
-                      <div className="border-t border-slate-100 pt-3 flex items-center justify-between text-[7px] text-slate-400">
-                        <span>{data.issuerName || 'Émetteur'} · Facture N° {data.invoiceNum}</span>
-                        <Image src="/algserv-logo.jpg" alt="ALGSERV" width={50} height={20} className="object-contain opacity-50" style={{ height: '16px', width: 'auto' }} />
-                      </div>
                     </div>
                   )}
 
@@ -631,10 +620,6 @@ export default function FacturePage() {
                       </div>
                       <div className="text-[8px] text-slate-500 italic border-t border-slate-100 pt-2">
                         {t.amountInWords} {amountWords} {t.currencyFull}
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 flex items-center justify-between text-[7px] text-slate-400 mt-4">
-                        <span>Facture N° {data.invoiceNum}</span>
-                        <Image src="/algserv-logo.jpg" alt="ALGSERV" width={50} height={20} className="object-contain opacity-50" style={{ height: '16px', width: 'auto' }} />
                       </div>
                     </div>
                   )}

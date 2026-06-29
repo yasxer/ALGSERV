@@ -129,7 +129,7 @@ const ICONS = {
 /* --- Services config (icons + layout, not translatable) ------- */
 const SERVICES_CONFIG = [
   { slug: "cv",           color: "blue",    active: true,  icon: ICONS.document,     href: "/order/documents" },
-  { slug: "professional", color: "indigo",  active: false, icon: ICONS.professional, href: "#"               },
+  { slug: "professional", color: "indigo",  active: true,  icon: ICONS.professional, href: "/order/professional" },
   { slug: "shopping",     color: "orange",  active: false, icon: ICONS.shopping,     href: "#"               },
   { slug: "business",     color: "emerald", active: true,  icon: ICONS.business,     href: "/order/business"  },
   { slug: "visa",         color: "purple",  active: false, icon: ICONS.visa,         href: "#"               },
