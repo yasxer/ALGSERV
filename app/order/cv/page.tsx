@@ -74,7 +74,7 @@ export default function CVPage() {
       `}</style>
 
       {/* Print target */}
-      <div className="cv-print-only" aria-hidden="true">
+      <div className="cv-print-only" dir="ltr" aria-hidden="true">
         <CVDoc d={d} lang={docLang} accentColor={accentColor} />
       </div>
 

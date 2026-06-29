@@ -300,7 +300,7 @@ export function CVForm({ d, setD, template, lang, docLang, accentColor, setAccen
           <div className="border border-border rounded-2xl p-5 bg-white shadow-sm">
             <p className="text-xs font-semibold text-ink-900 mb-0.5">{t.preview}</p>
             <p className="text-xs text-slate-600 mb-4">{t.previewSub}</p>
-            <div className="w-full overflow-hidden rounded-xl border border-border bg-white mb-4" style={{ aspectRatio: '210 / 297' }}>
+            <div dir="ltr" className="w-full overflow-hidden rounded-xl border border-border bg-white mb-4" style={{ aspectRatio: '210 / 297' }}>
               <div style={{ transform: 'scale(0.312)', transformOrigin: 'top left', width: '794px', pointerEvents: 'none', userSelect: 'none' }}>
                 <CVDoc d={d} lang={docLang} accentColor={accentColor} />
               </div>
