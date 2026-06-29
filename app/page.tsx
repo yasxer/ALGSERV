@@ -131,7 +131,7 @@ const SERVICES_CONFIG = [
   { slug: "cv",           color: "blue",    active: true,  icon: ICONS.document,     href: "/order/documents" },
   { slug: "professional", color: "indigo",  active: false, icon: ICONS.professional, href: "#"               },
   { slug: "shopping",     color: "orange",  active: false, icon: ICONS.shopping,     href: "#"               },
-  { slug: "business",     color: "emerald", active: false, icon: ICONS.business,     href: "#"               },
+  { slug: "business",     color: "emerald", active: true,  icon: ICONS.business,     href: "/order/business"  },
   { slug: "visa",         color: "purple",  active: false, icon: ICONS.visa,         href: "#"               },
   { slug: "digital",      color: "rose",    active: false, icon: ICONS.digital,      href: "#"               },
 ];
@@ -699,8 +699,28 @@ export default function Home() {
 
                 </div>
 
+                {/* Moqawil Dati mini chip */}
+                <Link href="/order/business/moqawil-dati" className="mt-5 w-full max-w-[400px] flex items-center gap-3 bg-white border border-blue-100 hover:border-blue-400 rounded-2xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 group">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M13 10h4M13 14h4"/>
+                    </svg>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-ink-900 group-hover:text-blue-700 transition-colors">
+                      {isRTL ? "بطاقة المقاول الذاتي" : lang === "fr" ? "Carte Auto-Entrepreneur" : "Self-Entrepreneur Card"}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      {isRTL ? "استخرج بطاقتك بسرعة وسهولة ← طلب إلكتروني" : lang === "fr" ? "Obtenez votre carte rapidement ← Demande en ligne" : "Get your card quickly ← Online request"}
+                    </span>
+                  </div>
+                  <span className="ms-auto text-blue-500 group-hover:translate-x-1 transition-transform">
+                    {isRTL ? ICONS.arrowLeft : ICONS.arrowRight}
+                  </span>
+                </Link>
+
                 {/* Facture mini chip */}
-                <Link href="/order/facture" className="mt-5 w-full max-w-[400px] flex items-center gap-3 bg-white border border-emerald-100 hover:border-emerald-400 rounded-2xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 group">
+                <Link href="/order/facture" className="mt-3 w-full max-w-[400px] flex items-center gap-3 bg-white border border-emerald-100 hover:border-emerald-400 rounded-2xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 group">
                   <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
                   </div>

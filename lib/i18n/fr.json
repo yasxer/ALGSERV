@@ -58,22 +58,22 @@
       "active": "Actif"
     },
     "featured": {
-      "breadcrumb": "Accueil > Documents Professionnels",
-      "title": "Vos documents professionnels en quelques clics",
-      "desc": "CV modernes ou factures commerciales algériennes — créez, personnalisez et téléchargez vos documents en PDF en quelques minutes, sans compétences techniques.",
-      "badges": ["Téléchargement immédiat en PDF", "Aperçu en temps réel", "CV + Facture disponibles", "Interface simple et rapide"],
-      "requiredFiles": "Ce dont vous avez besoin",
+      "breadcrumb": "Accueil > Nos services",
+      "title": "Nos services numériques à portée de main",
+      "desc": "Du CV professionnel à la carte auto-entrepreneur, en passant par la facture commerciale — tout ce dont vous avez besoin, géré en ligne depuis chez vous.",
+      "badges": ["Plusieurs services en une plateforme", "Livraison rapide & sécurisée", "Sans déplacement ni files", "Interface simple et rapide"],
+      "requiredFiles": "Nos services phares",
       "files": [
-        { "name": "Vos informations personnelles", "ext": "Formulaire" },
-        { "name": "Photo (pour le CV, optionnel)", "ext": "JPG, PNG" },
-        { "name": "Données commerciales (pour la facture)", "ext": "Formulaire" }
+        { "name": "CV Professionnel", "ext": "PDF immédiat" },
+        { "name": "Facture Commerciale", "ext": "PDF immédiat" },
+        { "name": "Carte Auto-Entrepreneur", "ext": "Demande en ligne" }
       ],
-      "termsTitle": "Conditions d'utilisation",
+      "termsTitle": "Pourquoi nous choisir ?",
       "terms": [
-        "Les informations fournies doivent être exactes",
-        "Le formulaire doit être rempli complètement",
-        "Service à usage strictement personnel ou commercial",
-        "Non remboursable après confirmation"
+        "Approuvé par des milliers de clients satisfaits",
+        "Rapidité d'exécution et qualité de résultat",
+        "Suivi direct par Telegram",
+        "Aucune compétence technique requise"
       ],
       "previewTitle": "Aperçu des modèles CV",
       "templateNames": {
@@ -88,18 +88,18 @@
     },
     "steps": {
       "title": "Comment ça marche ?",
-      "subtitle": "De votre canapé à votre document professionnel — en 5 étapes simples.",
+      "subtitle": "De chez vous à votre résultat — en 5 étapes simples.",
       "list": [
-        { "step": "Étape 01", "title": "Modèle idéal", "desc": "Parcourez et choisissez le modèle de votre choix." },
-        { "step": "Étape 02", "title": "Entrer les infos", "desc": "Remplissez notre formulaire guidé en ligne." },
-        { "step": "Étape 03", "title": "Aperçu en direct", "desc": "Révisez et apportez vos corrections en temps réel." },
-        { "step": "Étape 04", "title": "Régler en ligne", "desc": "Payez en toute sécurité par CIB ou Edahabia." },
-        { "step": "Étape 05", "title": "Télécharger", "desc": "Votre PDF professionnel est prêt à être téléchargé." }
+        { "step": "Étape 01", "title": "Choisissez votre service", "desc": "Parcourez nos services et choisissez ce dont vous avez besoin." },
+        { "step": "Étape 02", "title": "Remplissez le formulaire", "desc": "Saisissez vos informations ou joignez les documents requis." },
+        { "step": "Étape 03", "title": "Vérifiez votre demande", "desc": "Relisez et corrigez avant de soumettre." },
+        { "step": "Étape 04", "title": "Réglez en ligne", "desc": "Payez en toute sécurité par CIB ou Edahabia." },
+        { "step": "Étape 05", "title": "Recevez votre résultat", "desc": "PDF, carte ou suivi direct — livré rapidement après paiement." }
       ]
     },
     "ctaBanner": {
-      "title": "Prêt à créer votre document professionnel ?",
-      "subtitle": "Commencez dès maintenant. Paiement sécurisé avec CIB et Edahabia.",
+      "title": "Prêt à utiliser nos services ?",
+      "subtitle": "Commencez maintenant et obtenez ce qu'il vous faut depuis chez vous.",
       "button": "Commencer maintenant"
     }
   },

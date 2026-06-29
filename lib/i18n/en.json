@@ -58,22 +58,22 @@
       "active": "Active"
     },
     "featured": {
-      "breadcrumb": "Home > Professional Documents",
-      "title": "Your professional documents in a few clicks",
-      "desc": "Modern CV or Algerian commercial invoice — create, customize and download your documents as PDF in minutes, no technical skills required.",
-      "badges": ["Instant PDF download", "Live real-time preview", "CV + Invoice available", "Simple and fast interface"],
-      "requiredFiles": "What you need",
+      "breadcrumb": "Home > Our Services",
+      "title": "Our digital services at your fingertips",
+      "desc": "From professional CVs and invoices to self-entrepreneur cards — everything you need, handled online from home with no technical skills required.",
+      "badges": ["Multiple services in one platform", "Fast & secure delivery", "No travel or queues", "Simple and fast interface"],
+      "requiredFiles": "Our key services",
       "files": [
-        { "name": "Your personal information", "ext": "Online Form" },
-        { "name": "Personal photo (CV, optional)", "ext": "JPG, PNG" },
-        { "name": "Business data (for invoice)", "ext": "Online Form" }
+        { "name": "Professional CV", "ext": "Instant PDF" },
+        { "name": "Commercial Invoice", "ext": "Instant PDF" },
+        { "name": "Self-Entrepreneur Card", "ext": "Online request" }
       ],
-      "termsTitle": "Terms & Conditions",
+      "termsTitle": "Why choose us?",
       "terms": [
-        "All provided information must be accurate",
-        "Required fields must be fully completed",
-        "Service for personal or commercial use",
-        "Non-refundable after order confirmation"
+        "Trusted by thousands of satisfied customers",
+        "Fast turnaround with quality results",
+        "Direct follow-up via Telegram",
+        "No prior technical experience needed"
       ],
       "previewTitle": "CV Template Preview",
       "templateNames": {
@@ -88,18 +88,18 @@
     },
     "steps": {
       "title": "How does it work?",
-      "subtitle": "From your couch to your ready document in 5 simple steps.",
+      "subtitle": "From home to your result — in 5 simple steps.",
       "list": [
-        { "step": "Step 01", "title": "Select template", "desc": "Browse available layouts and choose your favorite." },
-        { "step": "Step 02", "title": "Enter your info", "desc": "Fill in the required fields in the form." },
-        { "step": "Step 03", "title": "Preview & edit", "desc": "Review your CV and make edits in real-time." },
+        { "step": "Step 01", "title": "Choose your service", "desc": "Browse our services and pick what you need." },
+        { "step": "Step 02", "title": "Enter your info", "desc": "Fill the form or upload the required documents." },
+        { "step": "Step 03", "title": "Review your request", "desc": "Check your details and make any changes before submitting." },
         { "step": "Step 04", "title": "Pay for order", "desc": "Choose your payment method (Edahabia or CIB)." },
-        { "step": "Step 05", "title": "Download CV", "desc": "Get your PDF file instantly after payment." }
+        { "step": "Step 05", "title": "Receive your result", "desc": "Get your service instantly — PDF, card, or direct follow-up." }
       ]
     },
     "ctaBanner": {
-      "title": "Ready to create your professional CV?",
-      "subtitle": "Start now and make a CV that stands out to recruiters.",
+      "title": "Ready to get started?",
+      "subtitle": "Start now and get what you need from home — fast, easy, and secure.",
       "button": "Start Now"
     }
   },
