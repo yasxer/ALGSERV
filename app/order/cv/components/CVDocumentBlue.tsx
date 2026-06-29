@@ -56,10 +56,10 @@ export function CVDocumentBlue({ d, lang, accentColor = '#1B4F8C' }: { d: CVData
   const initials = [d.firstName?.[0], d.lastName?.[0]].filter(Boolean).join('').toUpperCase() || '?'
 
   return (
-    <div style={{ width: '210mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: BODY, background: 'white', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '210mm', minHeight: '297mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: BODY, background: 'white', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
-      <div style={{ padding: `${hdrPad}px 28px`, display: 'flex', alignItems: 'flex-start', gap: '18px', flexDirection: isRTL ? 'row-reverse' : 'row', borderBottom: '1px solid #E2E8F0' }}>
+      <div style={{ padding: `${hdrPad + 8}px 28px ${hdrPad}px`, display: 'flex', alignItems: 'flex-start', gap: '18px', flexDirection: isRTL ? 'row-reverse' : 'row', borderBottom: '1px solid #E2E8F0' }}>
         <div style={{ width: `${circleSize}px`, height: `${circleSize}px`, borderRadius: '50%', background: '#E0E7EF', border: `2px solid ${BLUE}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
           {d.photo
             ? <img src={d.photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -68,8 +68,8 @@ export function CVDocumentBlue({ d, lang, accentColor = '#1B4F8C' }: { d: CVData
         </div>
         <div style={{ flex: 1, textAlign: isRTL ? 'right' : 'left' }}>
           <div style={{ fontSize: nameSize, fontWeight: 'bold', color: '#0F172A', lineHeight: 1.1, marginBottom: '4px' }}>{fullName}</div>
-          {d.jobTitle && <div style={{ fontSize: titleSize, color: BLUE, marginBottom: '8px', letterSpacing: '0.2px' }}>{d.jobTitle}</div>}
-          {d.profile  && <div style={{ fontSize: bodyFont, color: '#64748B', lineHeight: 1.65, maxWidth: '370px' }}>{d.profile}</div>}
+          {d.jobTitle && <div style={{ fontSize: titleSize, color: BLUE, marginBottom: '8px', letterSpacing: '0.2px', wordBreak: 'break-word', overflowWrap: 'break-word' }}>{d.jobTitle}</div>}
+          {d.profile  && <div style={{ fontSize: bodyFont, color: '#64748B', lineHeight: 1.65, maxWidth: '370px', wordBreak: 'break-word', overflowWrap: 'break-word' }}>{d.profile}</div>}
         </div>
       </div>
 
@@ -92,7 +92,7 @@ export function CVDocumentBlue({ d, lang, accentColor = '#1B4F8C' }: { d: CVData
           {(d.birthDate || d.nationality || d.maritalStatus || d.license) && (
             <div>
               <span style={secTitle()}>{t.cvPersonal}</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '8pt', color: BODY, textAlign: isRTL ? 'right' : 'left' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '8pt', color: BODY, textAlign: isRTL ? 'right' : 'left' }}>
                 {d.birthDate     && <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexDirection: isRTL ? 'row-reverse' : 'row' }}><CIcon type="calendar" size={9} color="#64748B" />{d.birthDate}</div>}
                 {d.nationality   && <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexDirection: isRTL ? 'row-reverse' : 'row' }}><CIcon type="flag" size={9} color="#64748B" />{d.nationality}</div>}
                 {d.maritalStatus && <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexDirection: isRTL ? 'row-reverse' : 'row' }}><CIcon type="heart" size={9} color="#64748B" />{d.maritalStatus}</div>}
@@ -154,7 +154,7 @@ export function CVDocumentBlue({ d, lang, accentColor = '#1B4F8C' }: { d: CVData
           {filledExps.length > 0 && (
             <div>
               <span style={secTitle()}>{t.cvExp}</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: sparse ? '22px' : dense ? '8px' : '14px' }}>
                 {filledExps.map(e => (
                   <div key={e.id} style={{ display: 'flex', gap: '8px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                     <div style={{ width: '54px', flexShrink: 0, fontSize: '7pt', color: BLUE, fontWeight: 'bold', paddingTop: '3px', textAlign: isRTL ? 'left' : 'right', lineHeight: 1.4 }}>
@@ -179,7 +179,7 @@ export function CVDocumentBlue({ d, lang, accentColor = '#1B4F8C' }: { d: CVData
           {filledEdus.length > 0 && (
             <div>
               <span style={secTitle()}>{t.cvEdu}</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: sparse ? '20px' : dense ? '6px' : '12px' }}>
                 {filledEdus.map(e => (
                   <div key={e.id} style={{ display: 'flex', gap: '8px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
                     <div style={{ width: '54px', flexShrink: 0, fontSize: '7pt', color: BLUE, fontWeight: 'bold', paddingTop: '3px', textAlign: isRTL ? 'left' : 'right' }}>{e.year}</div>

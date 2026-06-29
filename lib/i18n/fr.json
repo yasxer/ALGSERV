@@ -182,6 +182,7 @@
     "emptyPreview": "Remplissez le formulaire pour voir votre CV",
     "templateBlue": { "name": "Classique Bleu", "sub": "Layout structuré, sidebar claire, idéal pour tous les secteurs" },
     "templateGreen": { "name": "Moderne Vert", "sub": "En-tête dégradé élégant, design contemporain et percutant" },
+    "templateClassicCV": { "name": "Élégant Classic", "sub": "En-tête centré avec monogramme, mise en page épurée et professionnelle" },
     "interestLabels": {
       "book": "Lecture",
       "music": "Musique",
@@ -252,6 +253,7 @@
     "fillForm": "Saisie des données",
     "templateModern": "Design Moderne",
     "templateClassic": "Design Classique",
-    "templateMinimal": "Design Épuré"
+    "templateMinimal": "Design Épuré",
+    "docLanguage": "Langue du Document"
   }
 }

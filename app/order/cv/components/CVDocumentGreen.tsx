@@ -51,7 +51,7 @@ export function CVDocumentGreen({ d, lang, accentColor = '#0E7C5A' }: { d: CVDat
   }
 
   return (
-    <div style={{ width: '210mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: '#1a1a1a', background: 'white', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '210mm', minHeight: '297mm', fontFamily, direction: isRTL ? 'rtl' : 'ltr', color: '#1a1a1a', background: 'white', display: 'flex', flexDirection: 'column' }}>
 
       {/* Header */}
       <div style={{ background: `linear-gradient(120deg, ${DARK} 0%, ${ACCENT} 100%)`, padding: `${hdrPad}px 32px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>

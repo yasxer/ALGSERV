@@ -2,15 +2,16 @@
 
 import { useState } from 'react'
 import { translations, LangKey } from '@/lib/i18n'
-import { BlueThumbnail, GreenThumbnail } from './Thumbnails'
+import { BlueThumbnail, GreenThumbnail, ClassicThumbnail } from './Thumbnails'
 
 export function TemplateStep({ lang, onSelect }: { lang: LangKey; onSelect: (id: string) => void }) {
   const [hovered, setHovered] = useState<string | null>(null)
   const t = translations[lang].cv
 
   const templates = [
-    { id: 'blue',  accentHex: '#1B4F8C', Thumb: BlueThumbnail,  name: t.templateBlue.name,  sub: t.templateBlue.sub  },
-    { id: 'green', accentHex: '#0E7C5A', Thumb: GreenThumbnail, name: t.templateGreen.name, sub: t.templateGreen.sub },
+    { id: 'blue',    accentHex: '#1B4F8C', Thumb: BlueThumbnail,    name: t.templateBlue.name,      sub: t.templateBlue.sub      },
+    { id: 'green',   accentHex: '#0E7C5A', Thumb: GreenThumbnail,   name: t.templateGreen.name,     sub: t.templateGreen.sub     },
+    { id: 'classic', accentHex: '#8B5E3C', Thumb: ClassicThumbnail, name: t.templateClassicCV.name, sub: t.templateClassicCV.sub },
   ]
 
   return (
@@ -21,7 +22,7 @@ export function TemplateStep({ lang, onSelect }: { lang: LangKey; onSelect: (id:
         <p className="text-slate-600 text-sm">{t.chooseTemplateSub}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-3xl mx-auto w-full">
         {templates.map(tpl => (
           <button key={tpl.id} type="button"
             onClick={() => onSelect(tpl.id)}

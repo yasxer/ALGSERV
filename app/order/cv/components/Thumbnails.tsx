@@ -41,6 +41,55 @@ export function BlueThumbnail() {
   )
 }
 
+export function ClassicThumbnail() {
+  return (
+    <div style={{ width: '100%', height: '100%', background: 'white', display: 'flex', flexDirection: 'column', fontFamily: 'serif', overflow: 'hidden' }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', padding: '10px 8px 6px', borderBottom: '1px solid #e5e7eb' }}>
+        <div style={{ height: '7px', background: '#111', borderRadius: '1px', width: '55%', margin: '0 auto 3px' }} />
+        <div style={{ height: '2px', background: '#ccc', borderRadius: '1px', width: '15%', margin: '0 auto 5px' }} />
+        <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '1.5px solid #1B4F8C', margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#E0E7EF' }} />
+        </div>
+        <div style={{ height: '16px', border: '1px solid #93c5fd', borderRadius: '2px', margin: '0 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+          {[70,85,60].map((w,i) => <div key={i} style={{ height: '2px', background: '#cbd5e1', borderRadius: '1px', width: `${w * 0.35}px` }} />)}
+        </div>
+      </div>
+      {/* Columns */}
+      <div style={{ flex: 1, display: 'flex' }}>
+        <div style={{ width: '38%', borderRight: '1px solid #e5e7eb', padding: '4px 4px 4px 6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {[60,50,45].map((w, i) => (
+            <div key={i}>
+              <div style={{ height: '2px', background: '#1B4F8C', width: `${w}%`, marginBottom: '3px', opacity: 0.6 }} />
+              {[80,65,55].slice(0, i === 0 ? 3 : 2).map((_bw, j) => (
+                <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '2px', marginBottom: '1.5px' }}>
+                  <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#1B4F8C', flexShrink: 0 }} />
+                  <div style={{ height: '2px', background: '#d1d5db', borderRadius: '1px', flex: 1 }} />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div style={{ flex: 1, padding: '4px 6px 4px 4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {[0,1].map(i => (
+            <div key={i}>
+              <div style={{ height: '2px', background: '#1B4F8C', width: '65%', marginBottom: '2px', opacity: 0.6 }} />
+              <div style={{ height: '3px', background: '#111', width: '70%', borderRadius: '1px', marginBottom: '1.5px' }} />
+              <div style={{ height: '2px', background: '#93c5fd', width: '50%', borderRadius: '1px', marginBottom: '2px' }} />
+              {[75,60].map((w, j) => (
+                <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: '2px', marginBottom: '1px' }}>
+                  <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#1B4F8C', flexShrink: 0, marginTop: '1px' }} />
+                  <div style={{ height: '2px', background: '#d1d5db', width: `${w}%`, borderRadius: '1px', marginTop: '1px' }} />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function GreenThumbnail() {
   return (
     <div style={{ width: '100%', height: '100%', background: 'white', display: 'flex', flexDirection: 'column', fontFamily: 'sans-serif', overflow: 'hidden' }}>

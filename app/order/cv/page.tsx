@@ -9,6 +9,7 @@ import { useLang } from '@/lib/useLang'
 import { BLANK } from './constants'
 import { CVDocumentBlue } from './components/CVDocumentBlue'
 import { CVDocumentGreen } from './components/CVDocumentGreen'
+import { CVDocumentClassic } from './components/CVDocumentClassic'
 import { TemplateStep } from './components/TemplateStep'
 import { LanguageStep } from './components/LanguageStep'
 import { CVForm } from './components/CVForm'
@@ -20,10 +21,11 @@ export default function CVPage() {
   const [step, setStep]               = useState<Step>('template')
   const [template, setTemplate]       = useState<string>('blue')
   const [lang, setLang]               = useLang('fr')
+  const [docLang, setDocLang]         = useState<LangKey>('fr')
   const [d, setD]                     = useState<CVData>(BLANK)
   const [accentColor, setAccentColor] = useState<string>('#1B4F8C')
 
-  const CVDoc = template === 'blue' ? CVDocumentBlue : CVDocumentGreen
+  const CVDoc = template === 'blue' ? CVDocumentBlue : template === 'classic' ? CVDocumentClassic : CVDocumentGreen
 
   // Tag the current history entry as 'template' so popstate can read it back
   useEffect(() => {
@@ -46,12 +48,12 @@ export default function CVPage() {
 
   function handleTemplateSelect(id: string) {
     setTemplate(id)
-    setAccentColor(id === 'blue' ? '#1B4F8C' : '#0E7C5A')
+    setAccentColor(id === 'blue' ? '#1B4F8C' : id === 'classic' ? '#8B5E3C' : '#0E7C5A')
     goToStep('lang')
   }
 
   function handleLangSelect(l: LangKey) {
-    setLang(l)
+    setDocLang(l)
     goToStep('form')
   }
 
@@ -73,7 +75,7 @@ export default function CVPage() {
 
       {/* Print target */}
       <div className="cv-print-only" aria-hidden="true">
-        <CVDoc d={d} lang={lang} accentColor={accentColor} />
+        <CVDoc d={d} lang={docLang} accentColor={accentColor} />
       </div>
 
       {/* App UI */}
@@ -108,7 +110,7 @@ export default function CVPage() {
 
             {step === 'template' && <TemplateStep lang={lang} onSelect={handleTemplateSelect} />}
             {step === 'lang'     && <LanguageStep lang={lang} template={template} onSelect={handleLangSelect} onBack={goBack} />}
-            {step === 'form'     && <CVForm d={d} setD={setD} template={template} lang={lang} accentColor={accentColor} setAccentColor={setAccentColor} />}
+            {step === 'form'     && <CVForm d={d} setD={setD} template={template} lang={lang} docLang={docLang} accentColor={accentColor} setAccentColor={setAccentColor} />}
           </div>
         </main>
 

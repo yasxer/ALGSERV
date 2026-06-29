@@ -21,6 +21,7 @@ interface InvoiceData {
   issuerRc: string
   issuerAi: string
   issuerAddress: string
+  wilaya: string
   clientName: string
   clientNif: string
   clientRc: string
@@ -43,6 +44,7 @@ const BLANK: InvoiceData = {
   issuerRc: '',
   issuerAi: '',
   issuerAddress: '',
+  wilaya: '',
   clientName: '',
   clientNif: '',
   clientRc: '',
@@ -109,10 +111,12 @@ function fmtNum(n: number): string {
 // ==============================================================================
 export default function FacturePage() {
   const [lang, setLang] = useState<LangKey>('fr')
+  const [docLang, setDocLang] = useState<LangKey>('fr')
   const [template, setTemplate] = useState<'classic' | 'modern' | 'minimal'>('classic')
   const [data, setData] = useState<InvoiceData>(BLANK)
 
   const t = translations[lang].facture
+  const dt = translations[docLang].facture
   const isRTL = lang === 'ar'
 
   const set = (key: keyof InvoiceData, val: any) =>
@@ -180,6 +184,27 @@ export default function FacturePage() {
           {/* ---- LEFT: Form ---- */}
           <div className="print:hidden lg:col-span-5 flex flex-col gap-5 w-full">
 
+            {/* Document language selector */}
+            <div className="bg-white border border-[#DDE4F0] rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+              <h3 className="text-sm font-bold text-ink-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                {t.docLanguage}
+              </h3>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { id: 'fr', label: 'Français' },
+                  { id: 'ar', label: 'العربية' },
+                  { id: 'en', label: 'English' },
+                ] as const).map(l => (
+                  <button key={l.id} onClick={() => setDocLang(l.id)}
+                    className={`text-xs font-semibold py-2.5 px-2 rounded-xl border text-center transition-all cursor-pointer
+                      ${docLang === l.id ? 'border-blue-600 bg-blue-50/50 text-blue-600 ring-2 ring-blue-500/10' : 'border-[#DDE4F0] hover:border-slate-300 text-ink-700 bg-white'}`}>
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Template selector */}
             <div className="bg-white border border-[#DDE4F0] rounded-2xl p-5 shadow-sm flex flex-col gap-3">
               <h3 className="text-sm font-bold text-ink-900 border-b border-slate-100 pb-3 flex items-center gap-2">
@@ -222,6 +247,70 @@ export default function FacturePage() {
                 <div>
                   <label className={labelCls}>{t.address}</label>
                   <textarea rows={2} className={inputCls} placeholder="Cité Zone Des Travailleurs Grp 10 N°16 B.E.B Alger" value={data.issuerAddress} onChange={e => set('issuerAddress', e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelCls}>Wilaya</label>
+                  <select className={inputCls} value={data.wilaya} onChange={e => set('wilaya', e.target.value)}>
+                    <option value="">-- Choisir la wilaya --</option>
+                    <option value="Adrar">01 - Adrar</option>
+                    <option value="Chlef">02 - Chlef</option>
+                    <option value="Laghouat">03 - Laghouat</option>
+                    <option value="Oum El Bouaghi">04 - Oum El Bouaghi</option>
+                    <option value="Batna">05 - Batna</option>
+                    <option value="Béjaïa">06 - Béjaïa</option>
+                    <option value="Biskra">07 - Biskra</option>
+                    <option value="Béchar">08 - Béchar</option>
+                    <option value="Blida">09 - Blida</option>
+                    <option value="Bouira">10 - Bouira</option>
+                    <option value="Tamanrasset">11 - Tamanrasset</option>
+                    <option value="Tébessa">12 - Tébessa</option>
+                    <option value="Tlemcen">13 - Tlemcen</option>
+                    <option value="Tiaret">14 - Tiaret</option>
+                    <option value="Tizi Ouzou">15 - Tizi Ouzou</option>
+                    <option value="Alger">16 - Alger</option>
+                    <option value="Djelfa">17 - Djelfa</option>
+                    <option value="Jijel">18 - Jijel</option>
+                    <option value="Sétif">19 - Sétif</option>
+                    <option value="Saïda">20 - Saïda</option>
+                    <option value="Skikda">21 - Skikda</option>
+                    <option value="Sidi Bel Abbès">22 - Sidi Bel Abbès</option>
+                    <option value="Annaba">23 - Annaba</option>
+                    <option value="Guelma">24 - Guelma</option>
+                    <option value="Constantine">25 - Constantine</option>
+                    <option value="Médéa">26 - Médéa</option>
+                    <option value="Mostaganem">27 - Mostaganem</option>
+                    <option value="M'Sila">28 - M'Sila</option>
+                    <option value="Mascara">29 - Mascara</option>
+                    <option value="Ouargla">30 - Ouargla</option>
+                    <option value="Oran">31 - Oran</option>
+                    <option value="El Bayadh">32 - El Bayadh</option>
+                    <option value="Illizi">33 - Illizi</option>
+                    <option value="Bordj Bou Arréridj">34 - Bordj Bou Arréridj</option>
+                    <option value="Boumerdès">35 - Boumerdès</option>
+                    <option value="El Tarf">36 - El Tarf</option>
+                    <option value="Tindouf">37 - Tindouf</option>
+                    <option value="Tissemsilt">38 - Tissemsilt</option>
+                    <option value="El Oued">39 - El Oued</option>
+                    <option value="Khenchela">40 - Khenchela</option>
+                    <option value="Souk Ahras">41 - Souk Ahras</option>
+                    <option value="Tipaza">42 - Tipaza</option>
+                    <option value="Mila">43 - Mila</option>
+                    <option value="Aïn Defla">44 - Aïn Defla</option>
+                    <option value="Naâma">45 - Naâma</option>
+                    <option value="Aïn Témouchent">46 - Aïn Témouchent</option>
+                    <option value="Ghardaïa">47 - Ghardaïa</option>
+                    <option value="Relizane">48 - Relizane</option>
+                    <option value="Timimoun">49 - Timimoun</option>
+                    <option value="Bordj Badji Mokhtar">50 - Bordj Badji Mokhtar</option>
+                    <option value="Ouled Djellal">51 - Ouled Djellal</option>
+                    <option value="Béni Abbès">52 - Béni Abbès</option>
+                    <option value="In Salah">53 - In Salah</option>
+                    <option value="In Guezzam">54 - In Guezzam</option>
+                    <option value="Touggourt">55 - Touggourt</option>
+                    <option value="Djanet">56 - Djanet</option>
+                    <option value="El M'Ghair">57 - El M'Ghair</option>
+                    <option value="El Meniaa">58 - El Meniaa</option>
+                  </select>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
@@ -371,15 +460,9 @@ export default function FacturePage() {
 
                       {/* Date & Period — right aligned */}
                       <div className="text-right mb-4 text-[9.5pt]">
-                        {data.issuerAddress && (
-                          <p>
-                            {(() => {
-                              const city = data.issuerAddress.split(' ').pop() || 'Alger'
-                              return `${city.charAt(0).toUpperCase() + city.slice(1)}, le ${displayDate}`
-                            })()}
-                          </p>
+                        {displayDate && (
+                          <p>{data.wilaya || 'Alger'}, le {displayDate}</p>
                         )}
-                        {!data.issuerAddress && displayDate && <p>Alger, le {displayDate}</p>}
                         {data.period && <p><strong>Période {data.period}</strong></p>}
                       </div>
 
@@ -459,13 +542,13 @@ export default function FacturePage() {
 
                       {/* Amount in words */}
                       <div className="mt-4 text-[9pt]">
-                        <p className="font-bold underline">{t.amountInWords}</p>
-                        <p className="mt-1 italic">{amountWords} {t.currencyFull}</p>
+                        <p className="font-bold underline">{dt.amountInWords}</p>
+                        <p className="mt-1 italic">{amountWords} {dt.currencyFull}</p>
                       </div>
 
                       {/* Gérant signature */}
                       <div className="mt-8 text-right text-[10pt]">
-                        <p className="font-bold">{t.gerant}</p>
+                        <p className="font-bold">{dt.gerant}</p>
                       </div>
 
 
@@ -491,7 +574,7 @@ export default function FacturePage() {
                         </div>
                         <div className="text-right shrink-0">
                           <div className="bg-blue-600 text-white font-bold text-xs px-4 py-1.5 rounded-lg inline-block uppercase">
-                            {t.title}
+                            {dt.title}
                           </div>
                           <div className="mt-2 text-[9px] text-slate-500 flex flex-col gap-0.5 font-bold">
                             <span>N°: {data.invoiceNum}</span>
@@ -502,7 +585,7 @@ export default function FacturePage() {
                       </div>
                       {/* Client Block */}
                       <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 text-[9px] flex flex-col gap-0.5">
-                        <span className="text-[8px] font-bold uppercase tracking-wider text-blue-600 mb-1">{t.clientSection}</span>
+                        <span className="text-[8px] font-bold uppercase tracking-wider text-blue-600 mb-1">{dt.clientSection}</span>
                         <span className="font-bold text-sm text-ink-900">{data.clientName || "Nom du Client"}</span>
                         {data.clientNif && <span className="text-slate-500">NIF: {data.clientNif}</span>}
                         {data.clientRc && <span className="text-slate-500">RC: {data.clientRc}</span>}
@@ -515,10 +598,10 @@ export default function FacturePage() {
                           <thead>
                             <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase">
                               <th className="py-2 pb-2 w-8 text-center">#</th>
-                              <th className="py-2 pb-2 text-left">{t.description}</th>
-                              <th className="py-2 pb-2 text-center w-16">{t.qtyShort}</th>
-                              <th className="py-2 pb-2 text-right w-24">{t.puShort}</th>
-                              <th className="py-2 pb-2 text-right w-28">{t.totalShort}</th>
+                              <th className="py-2 pb-2 text-left">{dt.description}</th>
+                              <th className="py-2 pb-2 text-center w-16">{dt.qtyShort}</th>
+                              <th className="py-2 pb-2 text-right w-24">{dt.puShort}</th>
+                              <th className="py-2 pb-2 text-right w-28">{dt.totalShort}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
@@ -540,25 +623,29 @@ export default function FacturePage() {
                           {data.tvaRate > 0 && (
                             <>
                               <div className="flex justify-between font-semibold">
-                                <span>{t.subtotal}:</span>
-                                <span>{fmtNum(subtotalHT)} {t.currency}</span>
+                                <span>{dt.subtotal}:</span>
+                                <span>{fmtNum(subtotalHT)} {dt.currency}</span>
                               </div>
                               <div className="flex justify-between font-semibold">
-                                <span>{t.tva} ({data.tvaRate}%):</span>
-                                <span>{fmtNum(tvaAmount)} {t.currency}</span>
+                                <span>{dt.tva} ({data.tvaRate}%):</span>
+                                <span>{fmtNum(tvaAmount)} {dt.currency}</span>
                               </div>
                             </>
                           )}
                           <div className="flex justify-between font-bold text-sm border-t border-slate-100 pt-2 text-ink-900">
-                            <span>{t.total}:</span>
-                            <span className="text-blue-600">{fmtNum(totalTTC)} {t.currency}</span>
+                            <span>{dt.total}:</span>
+                            <span className="text-blue-600">{fmtNum(totalTTC)} {dt.currency}</span>
                           </div>
                         </div>
                       </div>
                       {/* Amount in words */}
                       <div className="text-[9px] text-slate-600 border-t border-slate-100 pt-3">
-                        <span className="font-bold">{t.amountInWords}</span>
-                        <br /><span className="italic">{amountWords} {t.currencyFull}</span>
+                        <span className="font-bold">{dt.amountInWords}</span>
+                        <br /><span className="italic">{amountWords} {dt.currencyFull}</span>
+                      </div>
+                      {/* Gérant signature */}
+                      <div className="mt-8 text-right text-[10pt]">
+                        <p className="font-bold">{dt.gerant}</p>
                       </div>
                     </div>
                   )}
@@ -568,7 +655,7 @@ export default function FacturePage() {
                     <div className="p-[10mm] print:p-[15mm] flex flex-col gap-5">
                       <div className="flex justify-between items-start border-b border-slate-100 pb-4">
                         <div>
-                          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{t.title}</span>
+                          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{dt.title}</span>
                           <h2 className="text-base font-bold text-ink-900 mt-0.5 uppercase">{data.issuerName || 'Émetteur'}</h2>
                           {data.issuerActivity && <p className="text-[9px] text-slate-500 mt-0.5">{data.issuerActivity}</p>}
                         </div>
@@ -586,7 +673,7 @@ export default function FacturePage() {
                           {data.issuerAi && <span>ART: {data.issuerAi}</span>}
                         </div>
                         <div className="flex flex-col gap-0.5">
-                          <span className="font-bold text-slate-400 uppercase text-[8px] tracking-wider mb-0.5">{t.clientSection}</span>
+                          <span className="font-bold text-slate-400 uppercase text-[8px] tracking-wider mb-0.5">{dt.clientSection}</span>
                           <span className="font-bold text-ink-900 text-sm">{data.clientName || 'Client'}</span>
                           {data.clientNif && <span className="text-slate-500">NIF: {data.clientNif}</span>}
                           {data.clientRc && <span className="text-slate-500">RC: {data.clientRc}</span>}
@@ -597,10 +684,10 @@ export default function FacturePage() {
                         <table className="w-full text-left text-[9px]">
                           <thead>
                             <tr className="border-b border-slate-200 text-slate-400 font-bold">
-                              <th className="py-1.5 text-left">{t.description}</th>
-                              <th className="py-1.5 text-center w-14">{t.qtyShort}</th>
-                              <th className="py-1.5 text-right w-20">{t.puShort}</th>
-                              <th className="py-1.5 text-right w-24">{t.totalShort}</th>
+                              <th className="py-1.5 text-left">{dt.description}</th>
+                              <th className="py-1.5 text-center w-14">{dt.qtyShort}</th>
+                              <th className="py-1.5 text-right w-20">{dt.puShort}</th>
+                              <th className="py-1.5 text-right w-24">{dt.totalShort}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-50">
@@ -615,11 +702,15 @@ export default function FacturePage() {
                           </tbody>
                         </table>
                         <div className="flex justify-end pt-2 border-t border-slate-100">
-                          <span className="text-[10px] font-bold text-ink-900">{t.total}: {fmtNum(totalTTC)} {t.currency}</span>
+                          <span className="text-[10px] font-bold text-ink-900">{dt.total}: {fmtNum(totalTTC)} {dt.currency}</span>
                         </div>
                       </div>
                       <div className="text-[8px] text-slate-500 italic border-t border-slate-100 pt-2">
-                        {t.amountInWords} {amountWords} {t.currencyFull}
+                        {dt.amountInWords} {amountWords} {dt.currencyFull}
+                      </div>
+                      {/* Gérant signature */}
+                      <div className="mt-8 text-right text-[10pt]">
+                        <p className="font-bold">{dt.gerant}</p>
                       </div>
                     </div>
                   )}
@@ -645,6 +736,10 @@ export default function FacturePage() {
       </div>
 
       <style jsx global>{`
+        @page {
+          margin: 0;
+          size: A4;
+        }
         @media print {
           body { background: white !important; color: black !important; }
           .print\\:hidden { display: none !important; }

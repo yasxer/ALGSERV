@@ -2,10 +2,13 @@
 
 import { useCallback } from 'react'
 import { translations, LangKey } from '@/lib/i18n'
+
+const arHelp = translations['ar'].cv.help
 import { uid, tN } from '../helpers'
 import type { CVData, Exp, Edu, Skill, Lang, Interest } from '../types'
 import { CVDocumentBlue } from './CVDocumentBlue'
 import { CVDocumentGreen } from './CVDocumentGreen'
+import { CVDocumentClassic } from './CVDocumentClassic'
 import { ColorPicker } from './ColorPicker'
 import { IconPicker } from './IconPicker'
 import { FormSection, DeleteBtn, AddBtn, LevelDots, StarLevel, inputCls, labelCls } from './FormHelpers'
@@ -15,11 +18,12 @@ type Props = {
   setD: React.Dispatch<React.SetStateAction<CVData>>
   template: string
   lang: LangKey
+  docLang: LangKey
   accentColor: string
   setAccentColor: (c: string) => void
 }
 
-export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }: Props) {
+export function CVForm({ d, setD, template, lang, docLang, accentColor, setAccentColor }: Props) {
   const t = translations[lang].cv
   const isRTL = lang === 'ar'
 
@@ -61,7 +65,7 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
   function delInterest(id: string)                        { set('interests', d.interests.filter(i => i.id !== id)) }
   function setInterest(id: string, f: keyof Interest, v: string) { set('interests', d.interests.map(i => i.id === id ? { ...i, [f]: v } : i)) }
 
-  const CVDoc = template === 'blue' ? CVDocumentBlue : CVDocumentGreen
+  const CVDoc = template === 'blue' ? CVDocumentBlue : template === 'classic' ? CVDocumentClassic : CVDocumentGreen
 
   const XBtn = ({ onClick }: { onClick: () => void }) => (
     <button type="button" onClick={onClick} className="shrink-0 text-ink-500 hover:text-red-500 transition-colors">
@@ -80,7 +84,7 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
             <ColorPicker value={accentColor} onChange={setAccentColor} />
           </FormSection>
 
-          <FormSection title={t.sPersonal} helpText={t.help.personal}>
+          <FormSection title={t.sPersonal} helpText={t.help.personal} helpTextAr={arHelp.personal}>
             {/* Photo */}
             <div className="mb-5">
               <label className={labelCls}>{t.photo}</label>
@@ -160,12 +164,12 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
             </div>
           </FormSection>
 
-          <FormSection title={t.sProfile} helpText={t.help.profile}>
+          <FormSection title={t.sProfile} helpText={t.help.profile} helpTextAr={arHelp.profile}>
             <textarea className={inputCls + ' resize-none'} rows={4}
               value={d.profile} onChange={e => set('profile', e.target.value)} />
           </FormSection>
 
-          <FormSection title={t.sExp} helpText={t.help.exp}>
+          <FormSection title={t.sExp} helpText={t.help.exp} helpTextAr={arHelp.exp}>
             {d.exps.length === 0 && <p className="text-xs text-ink-500 text-center py-4 mb-2">{t.noExp}</p>}
             {d.exps.map((exp, i) => (
               <div key={exp.id} className="border border-border rounded-xl p-4 mb-4">
@@ -209,7 +213,7 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
             <AddBtn onClick={addExp} label={t.addExp} />
           </FormSection>
 
-          <FormSection title={t.sEdu} helpText={t.help.edu}>
+          <FormSection title={t.sEdu} helpText={t.help.edu} helpTextAr={arHelp.edu}>
             {d.edus.length === 0 && <p className="text-xs text-ink-500 text-center py-4 mb-2">{t.noEdu}</p>}
             {d.edus.map((edu, i) => (
               <div key={edu.id} className="border border-border rounded-xl p-4 mb-4">
@@ -240,7 +244,7 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
             <AddBtn onClick={addEdu} label={t.addEdu} />
           </FormSection>
 
-          <FormSection title={t.sSkills} helpText={t.help.skills}>
+          <FormSection title={t.sSkills} helpText={t.help.skills} helpTextAr={arHelp.skills}>
             {d.skills.map((skill, i) => (
               <div key={skill.id} className="flex items-center gap-3 mb-3">
                 <input className={inputCls} type="text" placeholder={`${t.skillName} ${i + 1}`}
@@ -252,8 +256,8 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
             <AddBtn onClick={addSkill} label={t.addSkill} />
           </FormSection>
 
-          {template === 'blue' && (
-            <FormSection title={t.sTools} helpText={t.help.tools}>
+          {(template === 'blue' || template === 'classic') && (
+            <FormSection title={t.sTools} helpText={t.help.tools} helpTextAr={arHelp.tools}>
               {d.tools.map((tool, i) => (
                 <div key={tool.id} className="flex items-center gap-3 mb-3">
                   <input className={inputCls} type="text" placeholder={`${t.toolName} ${i + 1}`}
@@ -266,7 +270,7 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
             </FormSection>
           )}
 
-          <FormSection title={t.sLangs} helpText={t.help.langs}>
+          <FormSection title={t.sLangs} helpText={t.help.langs} helpTextAr={arHelp.langs}>
             {d.langs.map(l => (
               <div key={l.id} className="flex items-center gap-3 mb-3">
                 <input className={inputCls} type="text" placeholder={t.langName}
@@ -278,7 +282,7 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
             <AddBtn onClick={addLang} label={t.addLang} />
           </FormSection>
 
-          <FormSection title={t.sInterests} helpText={t.help.interests}>
+          <FormSection title={t.sInterests} helpText={t.help.interests} helpTextAr={arHelp.interests}>
             {d.interests.map((interest, i) => (
               <div key={interest.id} className="flex items-center gap-3 mb-3">
                 <IconPicker value={interest.icon} onChange={icon => setInterest(interest.id, 'icon', icon)} />
@@ -298,7 +302,7 @@ export function CVForm({ d, setD, template, lang, accentColor, setAccentColor }:
             <p className="text-xs text-slate-600 mb-4">{t.previewSub}</p>
             <div className="w-full overflow-hidden rounded-xl border border-border bg-white mb-4" style={{ aspectRatio: '210 / 297' }}>
               <div style={{ transform: 'scale(0.312)', transformOrigin: 'top left', width: '794px', pointerEvents: 'none', userSelect: 'none' }}>
-                <CVDoc d={d} lang={lang} accentColor={accentColor} />
+                <CVDoc d={d} lang={docLang} accentColor={accentColor} />
               </div>
             </div>
             <button type="button" onClick={() => window.print()}

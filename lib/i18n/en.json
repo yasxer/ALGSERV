@@ -182,6 +182,7 @@
     "emptyPreview": "Fill in the form to see your CV",
     "templateBlue": { "name": "Classic Blue", "sub": "Structured layout with clear sidebar, ideal for all industries" },
     "templateGreen": { "name": "Modern Green", "sub": "Elegant gradient header, contemporary and impactful design" },
+    "templateClassicCV": { "name": "Elegant Classic", "sub": "Centered header with monogram, clean and professional layout" },
     "interestLabels": {
       "book": "Reading",
       "music": "Music",
@@ -252,6 +253,7 @@
     "fillForm": "Input Fields",
     "templateModern": "Modern Layout",
     "templateClassic": "Classic Layout",
-    "templateMinimal": "Minimal Layout"
+    "templateMinimal": "Minimal Layout",
+    "docLanguage": "Document Language"
   }
 }

@@ -182,6 +182,7 @@
     "emptyPreview": "أدخل معلوماتك لرؤية سيرتك الذاتية",
     "templateBlue": { "name": "كلاسيك أزرق", "sub": "تخطيط منظم وشريط جانبي واضح، مناسب لجميع القطاعات" },
     "templateGreen": { "name": "حديث أخضر", "sub": "رأس متدرج أنيق، تصميم معاصر وجذاب" },
+    "templateClassicCV": { "name": "كلاسيكي أنيق", "sub": "رأس مركزي مع مونوغرام، تصميم راقٍ واحترافي" },
     "interestLabels": {
       "book": "قراءة",
       "music": "موسيقى",
@@ -252,6 +253,7 @@
     "fillForm": "تعبئة بيانات الفاتورة",
     "templateModern": "تصميم عصري",
     "templateClassic": "تصميم كلاسيكي",
-    "templateMinimal": "تصميم بسيط"
+    "templateMinimal": "تصميم بسيط",
+    "docLanguage": "لغة الوثيقة"
   }
 }
