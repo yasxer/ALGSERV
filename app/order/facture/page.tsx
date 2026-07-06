@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import { translations, LangKey } from '@/lib/i18n'
+import { printDocument } from '@/lib/printDoc'
 
 // --- Types --------------------------------------------------------------------
 interface InvoiceItem {
@@ -108,12 +110,104 @@ function fmtNum(n: number): string {
   return n.toLocaleString('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+const STORAGE_KEY = 'facture_pending_data'
+const DRAFT_KEY = 'facture_draft'
+
 // ==============================================================================
-export default function FacturePage() {
+function FacturePageContent() {
+  const searchParams = useSearchParams()
   const [lang, setLang] = useState<LangKey>('fr')
   const [docLang, setDocLang] = useState<LangKey>('fr')
   const [template, setTemplate] = useState<'classic' | 'modern' | 'minimal'>('classic')
   const [data, setData] = useState<InvoiceData>(BLANK)
+  const [paid, setPaid] = useState(false)
+  const [paying, setPaying] = useState(false)
+  const [verifying, setVerifying] = useState(false)
+  const [payFailed, setPayFailed] = useState(false)
+
+  useEffect(() => {
+    const orderId = searchParams.get('checkout_id')
+
+    function restoreSavedData() {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          if (parsed.data) setData(parsed.data)
+          if (parsed.template) setTemplate(parsed.template)
+          if (parsed.docLang) setDocLang(parsed.docLang)
+        } catch { /* ignore */ }
+      }
+    }
+
+    if (orderId) {
+      setVerifying(true)
+      restoreSavedData()
+      fetch('/api/payment/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, service: 'facture' }),
+      })
+        .then(r => r.json())
+        .then(({ paid: isPaid }) => {
+          if (isPaid) {
+            localStorage.removeItem(STORAGE_KEY)
+            sessionStorage.removeItem(DRAFT_KEY)
+            setPaid(true)
+          } else {
+            setPayFailed(true)
+          }
+        })
+        .catch(() => setPayFailed(true))
+        .finally(() => setVerifying(false))
+    } else {
+      const draft = sessionStorage.getItem(DRAFT_KEY)
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft)
+          if (parsed.data) setData(parsed.data)
+          if (parsed.template) setTemplate(parsed.template)
+          if (parsed.docLang) setDocLang(parsed.docLang)
+        } catch { /* ignore */ }
+      }
+    }
+  }, [searchParams])
+
+  const _draftInit = useRef(true)
+  useEffect(() => {
+    if (_draftInit.current) { _draftInit.current = false; return }
+    if (searchParams.get('checkout_id')) return // don't clobber the draft while confirming payment
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ data, template, docLang }))
+  }, [data, template, docLang, searchParams])
+
+  async function handlePay() {
+    setPaying(true)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, template, docLang }))
+    try {
+      const res = await fetch('/api/payment/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service: 'facture',
+          locale: lang,
+          clientName: data.issuerName || '—',
+          details: { template, docLang, invoiceNum: data.invoiceNum },
+        }),
+      })
+      const json = await res.json()
+      if (json.checkout_url) {
+        window.location.href = json.checkout_url
+      } else {
+        localStorage.removeItem(STORAGE_KEY)
+        alert('Erreur lors de la création du paiement. Veuillez réessayer.')
+        setPaying(false)
+      }
+    } catch {
+      localStorage.removeItem(STORAGE_KEY)
+      alert('Erreur réseau. Veuillez réessayer.')
+      setPaying(false)
+    }
+  }
 
   const t = translations[lang].facture
   const dt = translations[docLang].facture
@@ -153,11 +247,34 @@ export default function FacturePage() {
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className={`min-h-screen bg-slate-50/50 flex flex-col ${isRTL ? 'font-arabic' : 'font-sans'}`}>
 
+      {(paying || verifying) && (
+        <div className="print:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4">
+          <svg className="animate-spin text-white" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity=".25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+          <p className="text-white font-semibold text-base">{verifying ? 'Vérification du paiement...' : 'Connexion à Chargily Pay...'}</p>
+          <p className="text-white/60 text-sm">Veuillez patienter quelques secondes</p>
+        </div>
+      )}
+
       <div className="print:hidden">
         <Header lang={lang} onLangChange={setLang} />
       </div>
 
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+
+        {/* Payment confirmed banner */}
+        {paid && (
+          <div className="print:hidden flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-xl">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Paiement confirmé — vous pouvez maintenant imprimer votre facture.
+          </div>
+        )}
+
+        {payFailed && !paid && (
+          <div className="print:hidden flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm font-semibold px-4 py-3 rounded-xl">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Paiement non confirmé. Si vous avez été débité, patientez quelques instants et rechargez la page.
+          </div>
+        )}
 
         {/* Breadcrumb & Title */}
         <div className="print:hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#E2E8F0] pb-6">
@@ -171,10 +288,21 @@ export default function FacturePage() {
             <Link href="/" className="flex-1 sm:flex-initial text-center text-sm font-semibold border border-[#DDE4F0] rounded-xl px-5 py-3 bg-white text-ink-800 hover:bg-slate-50 transition-colors">
               {t.back}
             </Link>
-            <button onClick={() => window.print()} className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-sm font-bold bg-blue-600 text-white rounded-xl px-7 py-3 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10 cursor-pointer">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-              {t.print}
-            </button>
+            {paid ? (
+              <button onClick={() => printDocument(data.issuerName || 'Facture')} className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-sm font-bold bg-blue-600 text-white rounded-xl px-7 py-3 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10 cursor-pointer">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                {t.print}
+              </button>
+            ) : (
+              <button onClick={handlePay} disabled={paying} className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-sm font-bold bg-blue-600 text-white rounded-xl px-7 py-3 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10 cursor-pointer disabled:opacity-60">
+                {paying ? (
+                  <svg className="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeOpacity=".3"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+                ) : (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                )}
+                Payer 250 DA & Imprimer
+              </button>
+            )}
           </div>
         </div>
 
@@ -754,5 +882,13 @@ export default function FacturePage() {
       `}</style>
 
     </div>
+  )
+}
+
+export default function FacturePage() {
+  return (
+    <Suspense>
+      <FacturePageContent />
+    </Suspense>
   )
 }

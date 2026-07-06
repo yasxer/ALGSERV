@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, ChangeEvent } from 'react'
+import { useState, useRef, useEffect, ChangeEvent, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import Header from '../../../components/Header'
 import Footer from '../../../components/Footer'
 import { useLang } from '@/lib/useLang'
@@ -213,12 +214,20 @@ function Field({ label, required, error, children }: {
 
 const inputClass = "w-full border border-slate-200 bg-white rounded-xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all"
 
+const STORAGE_KEY = 'moqawil_pending_form'
+const DRAFT_KEY = 'moqawil_draft'
+
 /* ── Main Page ───────────────────────────────────────────────── */
-export default function MoqawilDatiPage() {
+function MoqawilDatiPageContent() {
+  const searchParams = useSearchParams()
   const [lang, setLang] = useLang('ar')
   const t = T[lang]
   const isRTL = lang === 'ar'
 
+  const [paid, setPaid] = useState(false)
+  const [paying, setPaying] = useState(false)
+  const [verifying, setVerifying] = useState(false)
+  const [payFailed, setPayFailed] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [serverError, setServerError] = useState('')
@@ -233,6 +242,99 @@ export default function MoqawilDatiPage() {
     dob: '', pob: '', wilaya: '', commune: '',
     address: '', phone: '', email: '', activity: '',
   })
+
+  // Restore form data; unlock submission only after server-verified payment.
+  useEffect(() => {
+    const orderId = searchParams.get('checkout_id')
+
+    if (orderId) {
+      setVerifying(true)
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        try { setForm(JSON.parse(saved)) } catch { /* ignore */ }
+      }
+      fetch('/api/payment/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, service: 'moqawil-dati' }),
+      })
+        .then(r => r.json())
+        .then(({ paid: isPaid }) => {
+          if (isPaid) {
+            localStorage.removeItem(STORAGE_KEY)
+            sessionStorage.removeItem(DRAFT_KEY)
+            setPaid(true)
+          } else {
+            setPayFailed(true)
+          }
+        })
+        .catch(() => setPayFailed(true))
+        .finally(() => setVerifying(false))
+    } else {
+      const draft = sessionStorage.getItem(DRAFT_KEY)
+      if (draft) {
+        try { setForm(JSON.parse(draft)) } catch { /* ignore */ }
+      }
+    }
+  }, [searchParams])
+
+  const _draftInit = useRef(true)
+  useEffect(() => {
+    if (_draftInit.current) { _draftInit.current = false; return }
+    if (searchParams.get('checkout_id')) return
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(form))
+  }, [form, searchParams])
+
+  // After payment the user must re-upload the 3 files and submit, and only then
+  // do the documents reach us (Telegram). With no server-side order record, a
+  // closed tab means a paid order whose files we never receive — warn before leaving.
+  useEffect(() => {
+    if (!paid || submitted) return
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [paid, submitted])
+
+  async function handlePay(e: React.FormEvent) {
+    e.preventDefault()
+    // Validate text fields before redirecting to payment
+    const errs = validate()
+    const fileErrs: Record<string, string> = {}
+    if (!photo) fileErrs.photo = t.required
+    if (!idCard) fileErrs.idCard = t.required
+    if (!selfie) fileErrs.selfie = t.required
+    const allErrs = { ...errs, ...fileErrs }
+    if (Object.keys(allErrs).length) { setErrors(allErrs); return }
+
+    setPaying(true)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(form))
+    try {
+      const res = await fetch('/api/payment/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service: 'moqawil-dati',
+          locale: lang,
+          clientName: form.fullName || '—',
+          clientEmail: form.email || '—',
+          clientPhone: form.phone || undefined,
+          details: { wilaya: form.wilaya, activity: form.activity },
+        }),
+      })
+      const json = await res.json()
+      if (json.checkout_url) {
+        window.location.href = json.checkout_url
+      } else {
+        localStorage.removeItem(STORAGE_KEY)
+        setServerError(t.errorMsg)
+        setPaying(false)
+      }
+    } catch {
+      localStorage.removeItem(STORAGE_KEY)
+      setServerError(t.errorMsg)
+      setPaying(false)
+    }
+  }
 
   const set = (k: string) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm(f => ({ ...f, [k]: e.target.value }))
@@ -279,6 +381,21 @@ export default function MoqawilDatiPage() {
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className={`min-h-screen bg-slate-50/50 flex flex-col ${isRTL ? 'font-arabic' : 'font-sans'}`}>
+
+      {(paying || verifying) && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4">
+          <svg className="animate-spin text-white" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity=".25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+          <p className="text-white font-semibold text-base">
+            {verifying
+              ? (lang === 'ar' ? 'جارٍ التحقق من الدفع...' : 'Vérification du paiement...')
+              : (lang === 'ar' ? 'جارٍ الاتصال بـ Chargily Pay...' : 'Connexion à Chargily Pay...')}
+          </p>
+          <p className="text-white/60 text-sm">
+            {lang === 'ar' ? 'انتظر لحظة من فضلك' : 'Veuillez patienter quelques secondes'}
+          </p>
+        </div>
+      )}
+
       <Header lang={lang} onLangChange={setLang} />
 
       <main className="flex-1 w-full">
@@ -331,7 +448,22 @@ export default function MoqawilDatiPage() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8">
+              <form onSubmit={paid ? handleSubmit : handlePay} noValidate className="flex flex-col gap-8">
+
+                {/* Payment confirmed banner */}
+                {paid && (
+                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-xl">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {lang === 'ar' ? 'تم تأكيد الدفع — أعد تحميل الوثائق وأرسل الطلب.' : lang === 'en' ? 'Payment confirmed — re-upload your documents and submit.' : 'Paiement confirmé — re-sélectionnez vos documents et envoyez.'}
+                  </div>
+                )}
+
+                {payFailed && !paid && (
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm font-semibold px-4 py-3 rounded-xl">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {lang === 'ar' ? 'لم يتم تأكيد الدفع. إذا تم خصم المبلغ، انتظر قليلاً ثم أعد تحميل الصفحة.' : lang === 'en' ? 'Payment not confirmed. If you were charged, wait a moment and reload.' : 'Paiement non confirmé. Si vous avez été débité, patientez puis rechargez.'}
+                  </div>
+                )}
 
                 {/* ── Section 1: Documents ── */}
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-7">
@@ -423,19 +555,24 @@ export default function MoqawilDatiPage() {
                   </div>
                 )}
 
-                <button type="submit" disabled={submitting}
+                <button type="submit" disabled={submitting || paying}
                   className="w-full sm:w-auto sm:self-end inline-flex items-center justify-center gap-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-bold px-10 py-4 rounded-xl text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-blue-600/10">
-                  {submitting ? (
+                  {(submitting || paying) ? (
                     <>
                       <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeOpacity=".3"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
-                      {t.submitting}
+                      {paying ? (lang === 'ar' ? 'جارٍ التوجيه...' : 'Redirection...') : t.submitting}
                     </>
-                  ) : (
+                  ) : paid ? (
                     <>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                       </svg>
                       {t.submit}
+                    </>
+                  ) : (
+                    <>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                      {lang === 'ar' ? 'الدفع 2500 دج وإرسال الطلب' : lang === 'en' ? 'Pay 2500 DA & Submit' : 'Payer 2500 DA & Envoyer'}
                     </>
                   )}
                 </button>
@@ -448,5 +585,13 @@ export default function MoqawilDatiPage() {
 
       <Footer lang={lang as LangKey} />
     </div>
+  )
+}
+
+export default function MoqawilDatiPage() {
+  return (
+    <Suspense>
+      <MoqawilDatiPageContent />
+    </Suspense>
   )
 }
