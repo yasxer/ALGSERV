@@ -55,7 +55,13 @@ export async function POST(request: NextRequest) {
       orderId: checkout.id,
     })
   } catch (error) {
-    console.error('[Chargily] Create checkout error:', error)
-    return Response.json({ error: 'Payment creation failed' }, { status: 500 })
+    // Surface the real Chargily error to the logs AND (for now) to the client so a
+    // failing live checkout can be diagnosed. `error` from the SDK often wraps an
+    // HTTP response — dig out the useful bits.
+    const err = error as { message?: string; response?: { status?: number; data?: unknown }; status?: number }
+    const detail = err?.response?.data ?? err?.message ?? String(error)
+    const status = err?.response?.status ?? err?.status
+    console.error('[Chargily] Create checkout error:', status, JSON.stringify(detail))
+    return Response.json({ error: 'Payment creation failed', status, detail }, { status: 500 })
   }
 }
