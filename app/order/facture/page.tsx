@@ -7,6 +7,7 @@ import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import { translations, LangKey } from '@/lib/i18n'
 import { printDocument } from '@/lib/printDoc'
+import { freeOfferActive } from '@/lib/promo'
 
 // --- Types --------------------------------------------------------------------
 interface InvoiceItem {
@@ -124,6 +125,13 @@ function FacturePageContent() {
   const [paying, setPaying] = useState(false)
   const [verifying, setVerifying] = useState(false)
   const [payFailed, setPayFailed] = useState(false)
+  // Launch offer: while active the invoice is free to print. Computed on the
+  // client only to avoid an SSR/CSR hydration mismatch on the time check.
+  const [offerFree, setOfferFree] = useState(false)
+  useEffect(() => { setOfferFree(freeOfferActive()) }, [])
+
+  // Printable once payment is confirmed, or while the free launch offer is running.
+  const unlocked = paid || offerFree
 
   useEffect(() => {
     const orderId = searchParams.get('checkout_id')
@@ -288,7 +296,7 @@ function FacturePageContent() {
             <Link href="/" className="flex-1 sm:flex-initial text-center text-sm font-semibold border border-[#DDE4F0] rounded-xl px-5 py-3 bg-white text-ink-800 hover:bg-slate-50 transition-colors">
               {t.back}
             </Link>
-            {paid ? (
+            {unlocked ? (
               <button onClick={() => printDocument(data.issuerName || 'Facture')} className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-sm font-bold bg-blue-600 text-white rounded-xl px-7 py-3 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10 cursor-pointer">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                 {t.print}

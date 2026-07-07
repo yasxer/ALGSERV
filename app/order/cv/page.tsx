@@ -20,6 +20,7 @@ import { TypeStep, type CvType } from './components/TypeStep'
 import { LanguageStep } from './components/LanguageStep'
 import { CVForm } from './components/CVForm'
 import { printDocument } from '@/lib/printDoc'
+import { freeOfferActive } from '@/lib/promo'
 import type { CVData } from './types'
 
 type Step = 'plan' | 'type' | 'lang' | 'form'
@@ -40,9 +41,14 @@ function CVPageContent() {
   const [paying, setPaying]           = useState(false)
   const [verifying, setVerifying]     = useState(false)
   const [payFailed, setPayFailed]     = useState(false)
+  // Launch offer: while active, every CV (premium included) is free. Computed on
+  // the client only to avoid an SSR/CSR hydration mismatch on the time check.
+  const [offerFree, setOfferFree]     = useState(false)
+  useEffect(() => { setOfferFree(freeOfferActive()) }, [])
 
   // Free CV is downloadable without payment; paid CV only after verified payment.
-  const unlocked = free || paid
+  // During the launch offer everything is unlocked too.
+  const unlocked = free || paid || offerFree
 
   const CVDoc = template === 'free' ? CVDocumentFree
     : template === 'european' ? CVDocumentEuropean
@@ -281,7 +287,7 @@ function CVPageContent() {
                 d={d} setD={setD}
                 template={template} lang={lang} docLang={docLang}
                 accentColor={accentColor} setAccentColor={setAccentColor}
-                paid={paid} onPay={handlePay} paying={paying} free={free}
+                paid={paid} onPay={handlePay} paying={paying} free={free} offerFree={offerFree}
                 onTemplateChange={changeTemplate}
               />
             )}
@@ -299,7 +305,7 @@ function CVPageContent() {
                   <path d="M9 12V3M9 12l-3-3M9 12l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M3 15h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
-                {free ? ({ fr: 'Télécharger gratuitement', en: 'Download for free', ar: 'تحميل مجاني' }[lang] ?? 'Télécharger gratuitement') : translations[lang].cv.download}
+                {(free || offerFree) ? ({ fr: 'Télécharger gratuitement', en: 'Download for free', ar: 'تحميل مجاني' }[lang] ?? 'Télécharger gratuitement') : translations[lang].cv.download}
               </button>
             ) : (
               <button type="button" onClick={handlePay} disabled={paying}

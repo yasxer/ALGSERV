@@ -29,13 +29,15 @@ type Props = {
   onPay?: () => void
   paying?: boolean
   free?: boolean
+  /** Launch offer active — unlock download without payment for any template. */
+  offerFree?: boolean
   onTemplateChange?: (id: string) => void
 }
 
-export function CVForm({ d, setD, template, lang, docLang, accentColor, setAccentColor, paid, onPay, paying, free, onTemplateChange }: Props) {
+export function CVForm({ d, setD, template, lang, docLang, accentColor, setAccentColor, paid, onPay, paying, free, offerFree, onTemplateChange }: Props) {
   const t = translations[lang].cv
   const isRTL = lang === 'ar'
-  const unlocked = paid || free
+  const unlocked = paid || free || offerFree
   const download = () => printDocument([d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV')
 
   // Field visibility per CV format.
@@ -359,7 +361,7 @@ export function CVForm({ d, setD, template, lang, docLang, accentColor, setAccen
                   <path d="M9 12V3M9 12l-3-3M9 12l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M3 15h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
-                {free ? ({ fr: 'Télécharger gratuitement', en: 'Download for free', ar: 'تحميل مجاني' }[lang] ?? 'Télécharger gratuitement') : t.download}
+                {(free || offerFree) ? ({ fr: 'Télécharger gratuitement', en: 'Download for free', ar: 'تحميل مجاني' }[lang] ?? 'Télécharger gratuitement') : t.download}
               </button>
             ) : (
               <button type="button" onClick={onPay} disabled={paying}

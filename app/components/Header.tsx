@@ -7,9 +7,11 @@ import { translations, LangKey } from "@/lib/i18n";
 interface HeaderProps {
   lang?: LangKey;
   onLangChange?: (lang: LangKey) => void;
+  /** Sticky offset from the top in px (used to sit below the promo banner). */
+  stickyTop?: number;
 }
 
-export default function Header({ lang = "fr", onLangChange }: HeaderProps) {
+export default function Header({ lang = "fr", onLangChange, stickyTop = 0 }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const t = translations[lang].header;
   const isRTL = lang === "ar";
@@ -17,7 +19,7 @@ export default function Header({ lang = "fr", onLangChange }: HeaderProps) {
   const languages: LangKey[] = ["ar", "fr", "en"];
 
   return (
-    <header className="w-full bg-white sticky top-0 z-50 border-b border-[#E2E8F0]" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+    <header className="w-full bg-white sticky z-50 border-b border-[#E2E8F0]" style={{ top: stickyTop, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
       <div 
         className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4"
         style={{ direction: isRTL ? "rtl" : "ltr" }}

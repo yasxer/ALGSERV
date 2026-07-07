@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import PromoBanner, { PROMO_BANNER_HEIGHT } from "./components/PromoBanner";
 import { translations, LangKey } from "@/lib/i18n";
 import { useLang } from "@/lib/useLang";
+import { freeOfferActive } from "@/lib/promo";
 
 /* --- SVG Paths for Icons -------------------------------------- */
 const ICONS = {
@@ -139,6 +141,9 @@ const SERVICES_CONFIG = [
 export default function Home() {
   const [lang, setLang] = useLang('ar');
   const [activeTemplate, setActiveTemplate] = useState<"blue" | "green" | "grey">("blue");
+  // Computed on the client only to avoid SSR/CSR hydration mismatch on the time check.
+  const [showPromo, setShowPromo] = useState(false);
+  useEffect(() => { setShowPromo(freeOfferActive()); }, []);
 
   const tl = translations[lang];
   const t = tl.home;
@@ -168,7 +173,8 @@ export default function Home() {
 
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className={`min-h-screen bg-slate-50/50 flex flex-col ${isRTL ? "font-arabic" : "font-sans"}`}>
-      <Header lang={lang} onLangChange={setLang} />
+      {showPromo && <PromoBanner lang={lang} onExpire={() => setShowPromo(false)} />}
+      <Header lang={lang} onLangChange={setLang} stickyTop={showPromo ? PROMO_BANNER_HEIGHT : 0} />
       
       <main className="flex-1 w-full overflow-hidden">
         {/* ---------------------------------------------------
