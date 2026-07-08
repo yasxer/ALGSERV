@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${jakarta.variable} ${tajawal.variable}`}>
-      <!-- Meta Pixel Code -->
+      
 <script>
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
