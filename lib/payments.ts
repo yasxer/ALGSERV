@@ -19,18 +19,31 @@ export interface OrderInfo {
  */
 export async function notifyOrderPaid(info: OrderInfo): Promise<void> {
   const svcName = SERVICE_NAMES[info.service as ServiceType] ?? info.service
-  const detailLines = info.details
-    ? Object.entries(info.details).map(([k, v]) => `• ${k}: ${String(v)}`)
-    : []
 
   const lines = [
     '💰 <b>Paiement confirmé — ALGSERV</b>',
     `🧾 Service : <b>${svcName}</b>`,
+    info.amount ? `💵 ${info.amount} DZD` : '',
     info.clientName ? `👤 Client : ${info.clientName}` : '',
     info.clientPhone ? `📞 ${info.clientPhone}` : '',
-    info.clientEmail && info.clientEmail !== '—' ? `✉ ${info.clientEmail}` : '',
-    info.amount ? `💵 ${info.amount} DZD` : '',
-    ...detailLines,
+  ].filter(Boolean)
+
+  await sendTelegramMessage(lines.join('\n'))
+}
+
+/**
+ * Notifies the owner via Telegram that a document was downloaded (free-offer
+ * or already-unlocked download click). Fired directly from the download
+ * button via /api/notify-download — not tied to a Chargily payment.
+ */
+export async function notifyDownload(info: Pick<OrderInfo, 'service' | 'clientName' | 'clientPhone'>): Promise<void> {
+  const svcName = SERVICE_NAMES[info.service as ServiceType] ?? info.service
+
+  const lines = [
+    '📥 <b>Téléchargement — ALGSERV</b>',
+    `🧾 Service : <b>${svcName}</b>`,
+    info.clientName ? `👤 Client : ${info.clientName}` : '',
+    info.clientPhone ? `📞 ${info.clientPhone}` : '',
   ].filter(Boolean)
 
   await sendTelegramMessage(lines.join('\n'))

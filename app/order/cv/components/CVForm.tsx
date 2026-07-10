@@ -38,7 +38,15 @@ export function CVForm({ d, setD, template, lang, docLang, accentColor, setAccen
   const t = translations[lang].cv
   const isRTL = lang === 'ar'
   const unlocked = paid || free || offerFree
-  const download = () => printDocument([d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV')
+  const download = () => {
+    const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
+    fetch('/api/notify-download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ service: 'cv', clientName, clientPhone: d.phone || undefined }),
+    }).catch(() => {})
+    printDocument(clientName)
+  }
 
   // Field visibility per CV format.
   const isPro = template === 'blue' || template === 'classic' || template === 'green'

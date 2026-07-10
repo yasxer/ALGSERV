@@ -188,6 +188,15 @@ function FacturePageContent() {
     sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ data, template, docLang }))
   }, [data, template, docLang, searchParams])
 
+  function handleDownload() {
+    fetch('/api/notify-download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ service: 'facture', clientName: data.issuerName || 'Facture' }),
+    }).catch(() => {})
+    printDocument(data.issuerName || 'Facture')
+  }
+
   async function handlePay() {
     setPaying(true)
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, template, docLang }))
@@ -297,7 +306,7 @@ function FacturePageContent() {
               {t.back}
             </Link>
             {unlocked ? (
-              <button onClick={() => printDocument(data.issuerName || 'Facture')} className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-sm font-bold bg-blue-600 text-white rounded-xl px-7 py-3 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10 cursor-pointer">
+              <button onClick={handleDownload} className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 text-sm font-bold bg-blue-600 text-white rounded-xl px-7 py-3 hover:bg-blue-700 transition-all shadow-md shadow-blue-500/10 cursor-pointer">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                 {t.print}
               </button>

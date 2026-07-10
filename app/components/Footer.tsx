@@ -109,7 +109,7 @@ export default function Footer({ lang = "fr" }: FooterProps) {
               <ul className="space-y-3.5 text-[14px] text-slate-400">
                 <li><Link href="/order/cv" className="hover:text-blue-500 transition-colors">{t.cv}</Link></li>
                 <li><Link href="/order/facture" className="hover:text-blue-500 transition-colors">{t.facture}</Link></li>
-                <li className="text-slate-600 text-xs pt-1">{t.visa}</li>
+                <li><Link href="/order/visa" className="hover:text-blue-500 transition-colors">{t.visa}</Link></li>
                 <li className="text-slate-600 text-xs">{t.autoEntr}</li>
               </ul>
             </div>

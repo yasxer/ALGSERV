@@ -20,20 +20,6 @@ const WILAYAS = [
   "عين صالح","عين قزام","تقرت","جانت","المغير","المنيعة"
 ]
 
-/* ── Activities ─────────────────────────────────────────────── */
-const ACTIVITIES = [
-  "خياطة وتفصيل","حلاقة رجالية","تجميل نسائي","نجارة","حدادة",
-  "سباكة وتركيب صحي","كهرباء بناء","بلاط وتبليط","طلاء وديكور داخلي",
-  "صيانة أجهزة كهرومنزلية","إصلاح أجهزة إلكترونية","تربية النحل","زراعة وبستنة",
-  "تطوير مواقع وتطبيقات","تصميم جرافيك","تسويق رقمي",
-  "تصوير فوتوغرافي وفيديو","إدخال بيانات ومعالجة نصوص","ترجمة ومراجعة نصوص",
-  "دروس خصوصية","تكوين مهني وتدريب",
-  "حلويات تقليدية وعصرية","طبخ ووجبات منزلية","بيع منتجات غذائية",
-  "توصيل طلبات","نقل بضائع خفيفة",
-  "تجارة التجزئة","بيع عبر الإنترنت","بيع ملابس وأكسسوارات",
-  "خدمات تنظيف وصيانة منازل","تنظيم فعاليات","وساطة تجارية","أخرى"
-]
-
 /* ── i18n ────────────────────────────────────────────────────── */
 const T = {
   ar: {
@@ -60,7 +46,7 @@ const T = {
     address: 'العنوان التفصيلي',
     phone: 'رقم الهاتف',
     email: 'البريد الإلكتروني (اختياري)',
-    activityPlaceholder: '— اختر نشاطك —',
+    activityPlaceholder: 'اكتب هنا وصف النشاط الذي تريد ممارسته...',
     wilayaPlaceholder: '— اختر الولاية —',
     submit: 'إرسال الطلب',
     submitting: 'جاري الإرسال...',
@@ -95,7 +81,7 @@ const T = {
     address: 'Adresse détaillée',
     phone: 'Numéro de téléphone',
     email: 'Email (optionnel)',
-    activityPlaceholder: '— Choisir l\'activité —',
+    activityPlaceholder: 'Décrivez ici l\'activité que vous souhaitez exercer...',
     wilayaPlaceholder: '— Choisir la wilaya —',
     submit: 'Envoyer la demande',
     submitting: 'Envoi en cours...',
@@ -130,7 +116,7 @@ const T = {
     address: 'Detailed address',
     phone: 'Phone number',
     email: 'Email (optional)',
-    activityPlaceholder: '— Select activity —',
+    activityPlaceholder: 'Describe here the activity you want to practice...',
     wilayaPlaceholder: '— Select wilaya —',
     submit: 'Submit request',
     submitting: 'Submitting...',
@@ -541,10 +527,8 @@ function MoqawilDatiPageContent() {
                     {t.secActivity}
                   </h2>
                   <Field label={t.secActivity} required error={errors.activity}>
-                    <select value={form.activity} onChange={set('activity')} className={`${inputClass} max-w-sm`}>
-                      <option value="">{t.activityPlaceholder}</option>
-                      {ACTIVITIES.map(a => <option key={a} value={a}>{a}</option>)}
-                    </select>
+                    <textarea value={form.activity} onChange={set('activity')} rows={3}
+                      placeholder={t.activityPlaceholder} className={`${inputClass} resize-none`} />
                   </Field>
                 </div>
 

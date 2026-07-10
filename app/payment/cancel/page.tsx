@@ -13,7 +13,7 @@ const SERVICE_ROUTES: Record<string, string> = {
 function CancelContent() {
   const params = useSearchParams()
   const service = params.get('service') || ''
-  const backUrl = SERVICE_ROUTES[service] || '/'
+  const backUrl = SERVICE_ROUTES[service] || (service.startsWith('evisa-') ? '/order/visa/evisa' : '/')
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">

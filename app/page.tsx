@@ -134,7 +134,7 @@ const SERVICES_CONFIG = [
   { slug: "professional", color: "indigo",  active: true,  icon: ICONS.professional, href: "/order/professional" },
   { slug: "shopping",     color: "orange",  active: false, icon: ICONS.shopping,     href: "#"               },
   { slug: "business",     color: "emerald", active: true,  icon: ICONS.business,     href: "/order/business"  },
-  { slug: "visa",         color: "purple",  active: false, icon: ICONS.visa,         href: "#"               },
+  { slug: "visa",         color: "purple",  active: true,  icon: ICONS.visa,         href: "/order/visa"     },
   { slug: "digital",      color: "rose",    active: false, icon: ICONS.digital,      href: "#"               },
 ];
 

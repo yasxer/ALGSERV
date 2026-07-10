@@ -174,6 +174,16 @@ function CVPageContent() {
 
   function clearSession() { sessionStorage.removeItem(SESSION_KEY) }
 
+  function handleDownload() {
+    const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
+    fetch('/api/notify-download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ service: 'cv', clientName, clientPhone: d.phone || undefined }),
+    }).catch(() => {})
+    printDocument(clientName)
+  }
+
   async function handlePay() {
     setPaying(true)
     // Save state before redirecting to Chargily
@@ -299,7 +309,7 @@ function CVPageContent() {
         {step === 'form' && (
           <div className="xl:hidden fixed bottom-0 inset-x-0 bg-white border-t border-border px-4 py-3.5 z-40">
             {unlocked ? (
-              <button type="button" onClick={() => printDocument([d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV')}
+              <button type="button" onClick={handleDownload}
                 className="w-full bg-emerald-700 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-emerald-500 active:scale-[.98] transition-all duration-200 flex items-center justify-center gap-2">
                 <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
                   <path d="M9 12V3M9 12l-3-3M9 12l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
