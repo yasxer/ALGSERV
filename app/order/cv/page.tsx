@@ -25,6 +25,8 @@ import type { CVData } from './types'
 
 type Step = 'plan' | 'type' | 'lang' | 'form'
 
+declare const fbq: (...args: any[]) => void
+
 const STORAGE_KEY = 'cv_pending_data'
 const SESSION_KEY = 'cv_session'
 
@@ -91,6 +93,7 @@ function CVPageContent() {
             localStorage.removeItem(STORAGE_KEY)
             sessionStorage.removeItem(SESSION_KEY)
             setPaid(true)
+            fbq('track', 'Purchase', { value: 500, currency: 'DZD' })
           } else {
             setPayFailed(true)
           }
@@ -186,7 +189,6 @@ function CVPageContent() {
 
   async function handlePay() {
     setPaying(true)
-      fbq('track', 'Lead')
     // Save state before redirecting to Chargily
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ d, template, docLang, accentColor }))
     try {
@@ -204,6 +206,7 @@ function CVPageContent() {
       })
       const data = await res.json()
       if (data.checkout_url) {
+        fbq('track', 'Lead')
         window.location.href = data.checkout_url
       } else {
         localStorage.removeItem(STORAGE_KEY)
