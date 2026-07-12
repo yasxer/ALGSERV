@@ -186,6 +186,7 @@ function CVPageContent() {
 
   async function handlePay() {
     setPaying(true)
+      fbq('track', 'Lead')
     // Save state before redirecting to Chargily
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ d, template, docLang, accentColor }))
     try {
