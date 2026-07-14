@@ -178,14 +178,15 @@ function CVPageContent() {
   function clearSession() { sessionStorage.removeItem(SESSION_KEY) }
 
   function handleDownload() {
-    const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
-    fetch('/api/notify-download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ service: 'cv', clientName, clientPhone: d.phone || undefined }),
-    }).catch(() => {})
-    printDocument(clientName)
-  }
+  const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
+  const serviceLabel = template === 'free' ? 'CV Simple' : 'CV Professionnel'
+  fetch('/api/notify-download', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ service: serviceLabel, clientName, clientPhone: d.phone || undefined }),
+  }).catch(() => {})
+  printDocument(clientName)
+}
 
   async function handlePay() {
     setPaying(true)
