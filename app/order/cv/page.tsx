@@ -179,7 +179,7 @@ function CVPageContent() {
 
   function handleDownload() {
   const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
-  const serviceLabel = template === 'free' ? 'CV Simple' : 'CV Professionnel'
+  const serviceLabel = free ? 'CV Simple' : 'CV Professionnel'
   fetch('/api/notify-download', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
