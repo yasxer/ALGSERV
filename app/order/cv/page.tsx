@@ -176,10 +176,15 @@ function CVPageContent() {
 
   function handleDownload() {
     const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
+    // Tell the owner exactly which CV was downloaded — the free/simple one is not "Professionnel".
+    const variant = template === 'free' ? 'CV Simple (Gratuit)'
+      : template === 'european' ? 'CV Européen'
+      : template === 'canadian' ? 'CV Canadien'
+      : 'CV Professionnel'
     fetch('/api/notify-download', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ service: 'cv', clientName, clientPhone: d.phone || undefined }),
+      body: JSON.stringify({ service: 'cv', variant, clientName, clientPhone: d.phone || undefined }),
     }).catch(() => {})
     printDocument(clientName)
   }
@@ -220,10 +225,13 @@ function CVPageContent() {
     <>
       <style>{`
         .cv-print-only { display: none; }
+        /* Kept at top level: Safari and older Chrome ignore @page when it is
+           nested inside @media, and a non-zero page margin makes the browser
+           print its own header/footer (URL + date) around the CV. */
+        @page { margin: 0; size: A4; }
         @media print {
           .cv-no-print   { display: none !important; }
           .cv-print-only { display: flex !important; }
-          @page { margin: 0; size: auto; }
           body { background: white !important; overflow: visible !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }

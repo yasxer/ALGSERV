@@ -36,8 +36,12 @@ export async function notifyOrderPaid(info: OrderInfo): Promise<void> {
  * or already-unlocked download click). Fired directly from the download
  * button via /api/notify-download — not tied to a Chargily payment.
  */
-export async function notifyDownload(info: Pick<OrderInfo, 'service' | 'clientName' | 'clientPhone'>): Promise<void> {
-  const svcName = SERVICE_NAMES[info.service as ServiceType] ?? info.service
+export async function notifyDownload(
+  info: Pick<OrderInfo, 'service' | 'clientName' | 'clientPhone'> & { variant?: string | null }
+): Promise<void> {
+  // The variant (e.g. "CV Simple (Gratuit)") is more precise than the generic
+  // service name, which labels every CV "CV Professionnel".
+  const svcName = info.variant || (SERVICE_NAMES[info.service as ServiceType] ?? info.service)
 
   const lines = [
     '📥 <b>Téléchargement — ALGSERV</b>',
