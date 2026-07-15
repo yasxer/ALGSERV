@@ -25,6 +25,8 @@ import type { CVData } from './types'
 
 type Step = 'plan' | 'type' | 'lang' | 'form'
 
+declare const fbq: (...args: any[]) => void
+
 const STORAGE_KEY = 'cv_pending_data'
 const SESSION_KEY = 'cv_session'
 
@@ -91,6 +93,7 @@ function CVPageContent() {
             localStorage.removeItem(STORAGE_KEY)
             sessionStorage.removeItem(SESSION_KEY)
             setPaid(true)
+            fbq('track', 'Purchase', { value: 500, currency: 'DZD' })
           } else {
             setPayFailed(true)
           }
@@ -175,6 +178,7 @@ function CVPageContent() {
   function clearSession() { sessionStorage.removeItem(SESSION_KEY) }
 
   function handleDownload() {
+<<<<<<< HEAD
     const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
     // Tell the owner exactly which CV was downloaded — the free/simple one is not "Professionnel".
     const variant = template === 'free' ? 'CV Simple (Gratuit)'
@@ -188,6 +192,17 @@ function CVPageContent() {
     }).catch(() => {})
     printDocument(clientName)
   }
+=======
+  const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
+  const serviceLabel = free ? 'CV Simple' : 'CV Professionnel'
+  fetch('/api/notify-download', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ service: serviceLabel, clientName, clientPhone: d.phone || undefined }),
+  }).catch(() => {})
+  printDocument(clientName)
+}
+>>>>>>> b9c0596ac67cd75ec956e2286345240f79aae7de
 
   async function handlePay() {
     setPaying(true)
@@ -208,6 +223,7 @@ function CVPageContent() {
       })
       const data = await res.json()
       if (data.checkout_url) {
+        fbq('track', 'Lead')
         window.location.href = data.checkout_url
       } else {
         localStorage.removeItem(STORAGE_KEY)
