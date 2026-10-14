@@ -1,30 +1,27 @@
 import { NextRequest, NextResponse, after } from 'next/server'
-
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!
-const CHAT_IDS  = (process.env.TELEGRAM_CHAT_ID ?? '').split(',').map(s => s.trim()).filter(Boolean)
-const TG        = `https://api.telegram.org/bot${BOT_TOKEN}`
-
-async function sendMessage(chatId: string, text: string) {
-  await fetch(`${TG}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
-  })
-}
+import { telegramConfigured, escapeHtml, sendTelegramMessage } from '@/lib/telegram'
 
 export async function POST(req: NextRequest) {
-  if (!BOT_TOKEN || CHAT_IDS.length === 0) {
+  if (!telegramConfigured) {
     return NextResponse.json({ error: 'Telegram not configured' }, { status: 500 })
   }
 
-  const body = await req.json()
-  const {
-    serviceType, // 'web-dev' | 'app-dev'
-    // client info
-    fullName, phone, email, wilaya,
-    // project info
-    projectType, platform, features, hasDesign, budget, timeline, description,
-  } = body
+  let body: Record<string, unknown>
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+  if (typeof body.fullName !== 'string' || !body.fullName.trim() || typeof body.phone !== 'string' || !body.phone.trim()) {
+    return NextResponse.json({ error: 'Missing name or phone' }, { status: 400 })
+  }
+
+  const serviceType = body.serviceType // 'web-dev' | 'app-dev'
+  const features = body.features
+  // client + project info, escaped for Telegram HTML
+  const [fullName, phone, email, wilaya, projectType, platform, hasDesign, budget, timeline, description] =
+    (['fullName', 'phone', 'email', 'wilaya', 'projectType', 'platform', 'hasDesign', 'budget', 'timeline', 'description'] as const)
+      .map(k => escapeHtml(body[k]))
 
   const reqId = Date.now().toString(36).toUpperCase()
   const now   = new Date().toLocaleString('fr-DZ', { timeZone: 'Africa/Algiers' })
@@ -32,7 +29,7 @@ export async function POST(req: NextRequest) {
   const serviceLabel = serviceType === 'web-dev' ? '🌐 تطوير مواقع ويب' : '📱 تطوير تطبيقات موبايل'
 
   const featuresText = Array.isArray(features) && features.length > 0
-    ? features.join(' / ')
+    ? features.map(escapeHtml).join(' / ')
     : '—'
 
   const platformLine = serviceType === 'app-dev' && platform
@@ -61,9 +58,7 @@ export async function POST(req: NextRequest) {
 ${description || '—'}
   `.trim()
 
-  after(async () => {
-    await Promise.all(CHAT_IDS.map(id => sendMessage(id, message)))
-  })
+  after(() => sendTelegramMessage(message))
 
   return NextResponse.json({ ok: true })
 }

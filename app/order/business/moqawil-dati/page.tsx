@@ -7,6 +7,7 @@ import Header from '../../../components/Header'
 import Footer from '../../../components/Footer'
 import { useLang } from '@/lib/useLang'
 import type { LangKey } from '@/lib/i18n'
+import { compressImage, MAX_UPLOAD_BYTES } from '@/lib/compressImage'
 
 /* ── Wilayas ────────────────────────────────────────────────── */
 const WILAYAS = [
@@ -53,6 +54,7 @@ const T = {
     successTitle: 'تم إرسال طلبك بنجاح!',
     successDesc: 'سنتواصل معك في أقرب وقت عبر رقم هاتفك أو التيليجرام.',
     errorMsg: 'حدث خطأ، يرجى المحاولة مجدداً.',
+    filesTooLarge: 'حجم الملفات كبير جداً. يرجى استعمال صور أو ملفات PDF أصغر.',
     required: 'هذا الحقل إلزامي',
     backBtn: 'العودة لخدمات الأعمال',
     newRequest: 'إرسال طلب جديد',
@@ -88,6 +90,7 @@ const T = {
     successTitle: 'Demande envoyée avec succès !',
     successDesc: 'Nous vous contacterons dans les plus brefs délais.',
     errorMsg: 'Une erreur est survenue, veuillez réessayer.',
+    filesTooLarge: 'Les fichiers sont trop lourds. Veuillez utiliser des photos ou PDF plus légers.',
     required: 'Ce champ est obligatoire',
     backBtn: 'Retour aux services',
     newRequest: 'Nouvelle demande',
@@ -123,6 +126,7 @@ const T = {
     successTitle: 'Request sent successfully!',
     successDesc: 'We will contact you as soon as possible via phone or Telegram.',
     errorMsg: 'An error occurred, please try again.',
+    filesTooLarge: 'Files are too large. Please use smaller photos or PDFs.',
     required: 'This field is required',
     backBtn: 'Back to services',
     newRequest: 'New request',
@@ -345,16 +349,27 @@ function MoqawilDatiPageContent() {
     setSubmitting(true)
     setServerError('')
 
-    const fd = new FormData()
-    Object.entries(form).forEach(([k, v]) => fd.append(k, v))
-    if (photo) fd.append('photo', photo)
-    if (idCard) fd.append('idCard', idCard)
-    if (selfie) fd.append('selfie', selfie)
-
     try {
+      const [p, id, sf] = await Promise.all([photo, idCard, selfie].map(f => f && compressImage(f)))
+      if ([p, id, sf].reduce((n, f) => n + (f?.size ?? 0), 0) > MAX_UPLOAD_BYTES) {
+        setServerError(t.filesTooLarge)
+        return
+      }
+
+      const fd = new FormData()
+      // The server re-checks this paid checkout with Chargily before accepting the order.
+      fd.append('checkout_id', searchParams.get('checkout_id') ?? '')
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v))
+      if (p) fd.append('photo', p)
+      if (id) fd.append('idCard', id)
+      if (sf) fd.append('selfie', sf)
+
       const res = await fetch('/api/moqawil-dati', { method: 'POST', body: fd })
-      if (res.ok) {
+      // 409: this paid order was already delivered (e.g. resubmitted after a refresh).
+      if (res.ok || res.status === 409) {
         setSubmitted(true)
+      } else if (res.status === 413) {
+        setServerError(t.filesTooLarge)
       } else {
         setServerError(t.errorMsg)
       }

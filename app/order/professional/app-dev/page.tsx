@@ -167,6 +167,7 @@ export default function AppDevPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
   const [loading, setLoading] = useState(false)
   const [done, setDone]     = useState(false)
+  const [submitError, setSubmitError] = useState(false)
 
   function set<K extends keyof FormData>(key: K, val: FormData[K]) {
     setForm(f => ({ ...f, [key]: val }))
@@ -209,8 +210,9 @@ export default function AppDevPage() {
 
   async function handleSubmit() {
     setLoading(true)
+    setSubmitError(false)
     try {
-      await fetch('/api/professional', {
+      const res = await fetch('/api/professional', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -228,7 +230,11 @@ export default function AppDevPage() {
           description: form.description,
         }),
       })
-      setDone(true)
+      // Only show the success screen once the request really reached us.
+      if (res.ok) setDone(true)
+      else setSubmitError(true)
+    } catch {
+      setSubmitError(true)
     } finally {
       setLoading(false)
     }
@@ -509,6 +515,12 @@ export default function AppDevPage() {
                 </div>
               )}
             </div>
+          )}
+
+          {submitError && (
+            <p className="mt-6 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              {lang === 'ar' ? 'حدث خطأ، لم يتم إرسال طلبك. يرجى المحاولة مجدداً.' : lang === 'fr' ? 'Une erreur est survenue, votre demande n’a pas été envoyée. Veuillez réessayer.' : 'Something went wrong, your request was not sent. Please try again.'}
+            </p>
           )}
 
           {/* Navigation */}

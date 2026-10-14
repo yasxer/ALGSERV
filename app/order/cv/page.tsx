@@ -19,7 +19,7 @@ import { PlanStep } from './components/PlanStep'
 import { TypeStep, type CvType } from './components/TypeStep'
 import { LanguageStep } from './components/LanguageStep'
 import { CVForm } from './components/CVForm'
-import { printDocument } from '@/lib/printDoc'
+import { downloadDocument } from '@/lib/downloadDoc'
 import { freeOfferActive } from '@/lib/promo'
 import type { CVData } from './types'
 
@@ -43,6 +43,7 @@ function CVPageContent() {
   const [paying, setPaying]           = useState(false)
   const [verifying, setVerifying]     = useState(false)
   const [payFailed, setPayFailed]     = useState(false)
+  const [downloading, setDownloading] = useState(false)
   // Launch offer: while active, every CV (premium included) is free. Computed on
   // the client only to avoid an SSR/CSR hydration mismatch on the time check.
   const [offerFree, setOfferFree]     = useState(false)
@@ -177,32 +178,27 @@ function CVPageContent() {
 
   function clearSession() { sessionStorage.removeItem(SESSION_KEY) }
 
-  function handleDownload() {
-<<<<<<< HEAD
-    const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
+  // Locks the download buttons from the click until the print dialog closes,
+  // so repeated taps can't fire several downloads/Telegram pings.
+  async function handleDownload() {
+    if (downloading) return
+    setDownloading(true)
     // Tell the owner exactly which CV was downloaded — the free/simple one is not "Professionnel".
     const variant = template === 'free' ? 'CV Simple (Gratuit)'
       : template === 'european' ? 'CV Européen'
       : template === 'canadian' ? 'CV Canadien'
       : 'CV Professionnel'
-    fetch('/api/notify-download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ service: 'cv', variant, clientName, clientPhone: d.phone || undefined }),
-    }).catch(() => {})
-    printDocument(clientName)
+    try {
+      await downloadDocument({
+        service: 'cv',
+        variant,
+        clientName: [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV',
+        clientPhone: d.phone || undefined,
+      })
+    } finally {
+      setDownloading(false)
+    }
   }
-=======
-  const clientName = [d.firstName, d.lastName].filter(Boolean).join(' ') || 'CV'
-  const serviceLabel = free ? 'CV Simple' : 'CV Professionnel'
-  fetch('/api/notify-download', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ service: serviceLabel, clientName, clientPhone: d.phone || undefined }),
-  }).catch(() => {})
-  printDocument(clientName)
-}
->>>>>>> b9c0596ac67cd75ec956e2286345240f79aae7de
 
   async function handlePay() {
     setPaying(true)
@@ -322,6 +318,7 @@ function CVPageContent() {
                 template={template} lang={lang} docLang={docLang}
                 accentColor={accentColor} setAccentColor={setAccentColor}
                 paid={paid} onPay={handlePay} paying={paying} free={free} offerFree={offerFree}
+                onDownload={handleDownload} downloading={downloading}
                 onTemplateChange={changeTemplate}
               />
             )}
@@ -333,12 +330,16 @@ function CVPageContent() {
         {step === 'form' && (
           <div className="xl:hidden fixed bottom-0 inset-x-0 bg-white border-t border-border px-4 py-3.5 z-40">
             {unlocked ? (
-              <button type="button" onClick={handleDownload}
-                className="w-full bg-emerald-700 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-emerald-500 active:scale-[.98] transition-all duration-200 flex items-center justify-center gap-2">
-                <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 12V3M9 12l-3-3M9 12l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M3 15h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
+              <button type="button" onClick={handleDownload} disabled={downloading}
+                className="w-full bg-emerald-700 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-emerald-500 active:scale-[.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60">
+                {downloading ? (
+                  <svg className="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeOpacity=".3"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+                ) : (
+                  <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
+                    <path d="M9 12V3M9 12l-3-3M9 12l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M3 15h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                )}
                 {(free || offerFree) ? ({ fr: 'Télécharger gratuitement', en: 'Download for free', ar: 'تحميل مجاني' }[lang] ?? 'Télécharger gratuitement') : translations[lang].cv.download}
               </button>
             ) : (

@@ -1,5 +1,5 @@
-import { sendTelegramMessage } from './telegram'
-import { SERVICE_NAMES, ServiceType } from './chargily'
+import { sendTelegramMessage, escapeHtml } from './telegram'
+import { chargilyClient, SERVICE_NAMES, ServiceType } from './chargily'
 
 export interface OrderInfo {
   service: string
@@ -22,10 +22,10 @@ export async function notifyOrderPaid(info: OrderInfo): Promise<void> {
 
   const lines = [
     '💰 <b>Paiement confirmé — ALGSERV</b>',
-    `🧾 Service : <b>${svcName}</b>`,
-    info.amount ? `💵 ${info.amount} DZD` : '',
-    info.clientName ? `👤 Client : ${info.clientName}` : '',
-    info.clientPhone ? `📞 ${info.clientPhone}` : '',
+    `🧾 Service : <b>${escapeHtml(svcName)}</b>`,
+    info.amount ? `💵 ${escapeHtml(info.amount)} DZD` : '',
+    info.clientName ? `👤 Client : ${escapeHtml(info.clientName)}` : '',
+    info.clientPhone ? `📞 ${escapeHtml(info.clientPhone)}` : '',
   ].filter(Boolean)
 
   await sendTelegramMessage(lines.join('\n'))
@@ -45,10 +45,49 @@ export async function notifyDownload(
 
   const lines = [
     '📥 <b>Téléchargement — ALGSERV</b>',
-    `🧾 Service : <b>${svcName}</b>`,
-    info.clientName ? `👤 Client : ${info.clientName}` : '',
-    info.clientPhone ? `📞 ${info.clientPhone}` : '',
+    `🧾 Service : <b>${escapeHtml(svcName)}</b>`,
+    info.clientName ? `👤 Client : ${escapeHtml(info.clientName)}` : '',
+    info.clientPhone ? `📞 ${escapeHtml(info.clientPhone)}` : '',
   ].filter(Boolean)
 
   await sendTelegramMessage(lines.join('\n'))
+}
+
+export interface PaidCheckout {
+  id: string
+  service: string
+  amount: number
+}
+
+/**
+ * Asks Chargily whether `checkoutId` is paid and, if `accepts` is given, that it
+ * was created for an accepted service. Returns null when not paid / unknown.
+ */
+export async function getPaidCheckout(
+  checkoutId: unknown,
+  accepts?: (service: string) => boolean,
+): Promise<PaidCheckout | null> {
+  if (!checkoutId || typeof checkoutId !== 'string') return null
+  try {
+    const checkout = await chargilyClient.getCheckout(checkoutId)
+    const service = String(checkout.metadata?.service ?? '')
+    if (checkout.status !== 'paid') return null
+    if (accepts && !accepts(service)) return null
+    return { id: checkout.id, service, amount: checkout.amount }
+  } catch (err) {
+    console.error('[payments] getCheckout failed:', err)
+    return null
+  }
+}
+
+// Checkout ids that already delivered their order. In-memory, so best-effort only
+// (per server instance) — the checkout id is also printed in every Telegram
+// message so a duplicate that slips through is easy to spot.
+const usedCheckouts = new Set<string>()
+
+/** Marks a checkout as used; returns false if it was already used. */
+export function claimCheckout(checkoutId: string): boolean {
+  if (usedCheckouts.has(checkoutId)) return false
+  usedCheckouts.add(checkoutId)
+  return true
 }

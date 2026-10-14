@@ -7,6 +7,7 @@ import Header from '../../../components/Header'
 import Footer from '../../../components/Footer'
 import { useLang } from '@/lib/useLang'
 import type { LangKey } from '@/lib/i18n'
+import { compressImage, MAX_UPLOAD_BYTES } from '@/lib/compressImage'
 import { COUNTRIES, FLAGS, evisaServiceId, type Country } from './countries'
 
 /* ── i18n ────────────────────────────────────────────────────── */
@@ -40,6 +41,7 @@ const T = {
     successTitle: 'تم إرسال طلبك بنجاح!',
     successDesc: 'سنتواصل معك في أقرب وقت عبر رقم هاتفك لمتابعة طلب الفيزا.',
     errorMsg: 'حدث خطأ، يرجى المحاولة مجدداً.',
+    filesTooLarge: 'حجم الملفات كبير جداً. يرجى استعمال صور أو ملفات PDF أصغر.',
     required: 'هذا الحقل إلزامي',
     newRequest: 'إرسال طلب جديد',
     priceNote: 'ملاحظة: الأسعار قابلة للتغيير في أي وقت دون إشعار مسبق.',
@@ -80,6 +82,7 @@ const T = {
     successTitle: 'Demande envoyée avec succès !',
     successDesc: 'Nous vous contacterons dans les plus brefs délais pour le suivi de votre demande de visa.',
     errorMsg: 'Une erreur est survenue, veuillez réessayer.',
+    filesTooLarge: 'Les fichiers sont trop lourds. Veuillez utiliser des photos ou PDF plus légers.',
     required: 'Ce champ est obligatoire',
     newRequest: 'Nouvelle demande',
     priceNote: 'Remarque : les prix sont susceptibles de changer à tout moment sans préavis.',
@@ -120,6 +123,7 @@ const T = {
     successTitle: 'Request sent successfully!',
     successDesc: 'We will contact you as soon as possible to follow up on your visa application.',
     errorMsg: 'An error occurred, please try again.',
+    filesTooLarge: 'Files are too large. Please use smaller photos or PDFs.',
     required: 'This field is required',
     newRequest: 'New request',
     priceNote: 'Note: prices are subject to change at any time without prior notice.',
@@ -405,15 +409,26 @@ function EvisaPageContent() {
     setServerError('')
 
     const chosen = selected.priceOptions?.find(o => o.key === priceOption)
+    const docs = await Promise.all(selected.docs.map(async d => {
+      const f = files[d.key]
+      return { d, f: f ? await compressImage(f) : null }
+    }))
+    if (docs.reduce((n, { f }) => n + (f?.size ?? 0), 0) > MAX_UPLOAD_BYTES) {
+      setServerError(t.filesTooLarge)
+      setSubmitting(false)
+      return
+    }
+
     const fd = new FormData()
+    // The server re-checks this paid checkout with Chargily before accepting the order.
+    fd.append('checkout_id', searchParams.get('checkout_id') ?? '')
     fd.append('country', selected.id)
     fd.append('countryName', selected.name.ar)
     fd.append('processing', selected.processing.ar)
     fd.append('price', chosen ? `${chosen.price} دج — ${chosen.label.ar}` : `${selected.price} دج`)
     Object.entries(form).forEach(([k, v]) => fd.append(k, v))
     fd.append('maritalStatusLabel', maritalOptions.find(o => o.value === form.maritalStatus)?.label ?? form.maritalStatus)
-    selected.docs.forEach(d => {
-      const f = files[d.key]
+    docs.forEach(({ d, f }) => {
       if (f) {
         fd.append(`doc_${d.key}`, f)
         fd.append(`doclabel_${d.key}`, d.label.ar)
@@ -422,9 +437,12 @@ function EvisaPageContent() {
 
     try {
       const res = await fetch('/api/evisa', { method: 'POST', body: fd })
-      if (res.ok) {
+      // 409: this paid order was already delivered (e.g. resubmitted after a refresh).
+      if (res.ok || res.status === 409) {
         setSubmitted(true)
         window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else if (res.status === 413) {
+        setServerError(t.filesTooLarge)
       } else {
         setServerError(t.errorMsg)
       }

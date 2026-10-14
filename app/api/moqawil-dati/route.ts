@@ -1,72 +1,50 @@
 import { NextRequest, NextResponse, after } from 'next/server'
-import { readFileSync } from 'fs'
-import { join } from 'path'
-
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!
-const CHAT_IDS  = (process.env.TELEGRAM_CHAT_ID ?? '').split(',').map(s => s.trim()).filter(Boolean)
-const TG        = `https://api.telegram.org/bot${BOT_TOKEN}`
-
-async function sendMessage(chatId: string, text: string) {
-  await fetch(`${TG}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
-  })
-}
-
-async function sendFile(chatId: string, file: File, caption: string) {
-  const fd = new FormData()
-  fd.append('chat_id', chatId)
-  fd.append('caption', caption)
-  fd.append('document', file)
-  await fetch(`${TG}/sendDocument`, { method: 'POST', body: fd })
-}
-
-async function sendLogoPhoto(chatId: string, caption: string) {
-  try {
-    const logoBuffer = readFileSync(join(process.cwd(), 'public', 'algserv-logo.jpg'))
-    const logoFile = new File([logoBuffer], 'algserv-logo.jpg', { type: 'image/jpeg' })
-    const fd = new FormData()
-    fd.append('chat_id', chatId)
-    fd.append('caption', caption)
-    fd.append('photo', logoFile)
-    await fetch(`${TG}/sendPhoto`, { method: 'POST', body: fd })
-  } catch {
-    // non-critical
-  }
-}
+import { telegramConfigured, escapeHtml, sendMessageTo, sendFileTo, sendLogoTo, forEachChat } from '@/lib/telegram'
+import { getPaidCheckout, claimCheckout } from '@/lib/payments'
 
 /* Send everything to one chat ID sequentially (logo → msg → files) */
 async function sendToChat(chatId: string, message: string, reqId: string, photo: File | null, idCard: File | null, selfie: File | null) {
-  await sendLogoPhoto(chatId, `🔔 ALGSERV — طلب جديد #${reqId}`)
-  await sendMessage(chatId, message)
-  if (photo)  await sendFile(chatId, photo,  `📸 الصورة الشخصية — #${reqId}`)
-  if (idCard) await sendFile(chatId, idCard, `🪪 بطاقة التعريف / جواز السفر — #${reqId}`)
-  if (selfie) await sendFile(chatId, selfie, `🤳 السيلفي مع البطاقة — #${reqId}`)
+  await sendLogoTo(chatId, `🔔 ALGSERV — طلب جديد #${reqId}`)
+  await sendMessageTo(chatId, message)
+  if (photo)  await sendFileTo(chatId, photo,  `📸 الصورة الشخصية — #${reqId}`)
+  if (idCard) await sendFileTo(chatId, idCard, `🪪 بطاقة التعريف / جواز السفر — #${reqId}`)
+  if (selfie) await sendFileTo(chatId, selfie, `🤳 السيلفي مع البطاقة — #${reqId}`)
 }
 
+const asFile = (v: FormDataEntryValue | null) => (v instanceof File && v.size > 0 ? v : null)
+
 export async function POST(req: NextRequest) {
-  if (!BOT_TOKEN || CHAT_IDS.length === 0) {
+  if (!telegramConfigured) {
     return NextResponse.json({ error: 'Telegram not configured' }, { status: 500 })
   }
 
   const fd = await req.formData()
 
-  const fullName   = fd.get('fullName')   as string
-  const fatherName = fd.get('fatherName') as string
-  const motherName = fd.get('motherName') as string
-  const dob        = fd.get('dob')        as string
-  const pob        = fd.get('pob')        as string
-  const wilaya     = fd.get('wilaya')     as string
-  const commune    = fd.get('commune')    as string
-  const address    = fd.get('address')    as string
-  const phone      = fd.get('phone')      as string
-  const email      = fd.get('email')      as string
-  const activity   = fd.get('activity')   as string
+  // Only a paid, not-yet-used Moqawil checkout may deliver an order.
+  const checkout = await getPaidCheckout(fd.get('checkout_id'), s => s === 'moqawil-dati')
+  if (!checkout) {
+    return NextResponse.json({ error: 'Payment not verified' }, { status: 402 })
+  }
+  if (!claimCheckout(checkout.id)) {
+    return NextResponse.json({ error: 'Order already submitted' }, { status: 409 })
+  }
 
-  const photo  = fd.get('photo')  as File | null
-  const idCard = fd.get('idCard') as File | null
-  const selfie = fd.get('selfie') as File | null
+  const field = (k: string) => escapeHtml(fd.get(k))
+  const fullName   = field('fullName')
+  const fatherName = field('fatherName')
+  const motherName = field('motherName')
+  const dob        = field('dob')
+  const pob        = field('pob')
+  const wilaya     = field('wilaya')
+  const commune    = field('commune')
+  const address    = field('address')
+  const phone      = field('phone')
+  const email      = field('email')
+  const activity   = field('activity')
+
+  const photo  = asFile(fd.get('photo'))
+  const idCard = asFile(fd.get('idCard'))
+  const selfie = asFile(fd.get('selfie'))
 
   /* unique ID per submission to avoid confusion between simultaneous requests */
   const reqId = Date.now().toString(36).toUpperCase()
@@ -75,6 +53,7 @@ export async function POST(req: NextRequest) {
   const message = `
 🆕 <b>طلب بطاقة مقاول ذاتي</b>  |  #${reqId}
 🕒 ${now}
+💰 <b>مدفوع:</b> ${checkout.amount} دج  —  <code>${escapeHtml(checkout.id)}</code>
 
 👤 <b>المعلومات الشخصية:</b>
 • الاسم الكامل: <b>${fullName}</b>
@@ -95,12 +74,7 @@ export async function POST(req: NextRequest) {
   `.trim()
 
   /* ── Return OK immediately — send to Telegram in background ── */
-  after(async () => {
-    /* all chat IDs in parallel */
-    await Promise.all(
-      CHAT_IDS.map(id => sendToChat(id, message, reqId, photo, idCard, selfie))
-    )
-  })
+  after(() => forEachChat(id => sendToChat(id, message, reqId, photo, idCard, selfie)))
 
   return NextResponse.json({ ok: true })
 }
